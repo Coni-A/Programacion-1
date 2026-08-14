@@ -6,3 +6,4 @@ Sistema de gestion de inventarios:
 - costo
 - cantidad
 - nombre del producto o articulo
+- tipo de producto (secciones o sub categorias ej: lacteos, higiene, etc.)
