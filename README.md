@@ -31,6 +31,6 @@ Sistema de gestion de inventarios:
 - funcion verificacion no es vacio (funciona)
 - funcion verificacion de codigo (funciona)
 
-
+hay que crear un historial, imagino que deberiamos poner codigo de producto, fecha de baja, cantidad, precio unitario y precio total
 
 
