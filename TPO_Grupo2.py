@@ -2,9 +2,10 @@ from datetime import datetime
 
 #QUE FALTA: 
 # 1. HISTORIAL 
-# 2.FUNCION PARA CAMBIAR PRECIOS DE PRODUCTOS, LA MISMA SE PODRIA SUMAR A LA FUNCION BAJAS Y PODRIAMOS RENOMBRARLA COMO FUNCION MODIFICAR PRODUCTO
+# 2. FUNCION PARA CAMBIAR PRECIOS DE PRODUCTOS, LA MISMA SE PODRIA SUMAR A LA FUNCION BAJAS Y PODRIAMOS RENOMBRARLA COMO FUNCION MODIFICAR PRODUCTO
 # 3. QUE LA FUNCION DAR DE BAJA TENGA UN CICLO WHILE
 # 4. podriamos conciderar la opcion de dar un menu de categorias pre-definidas (es algo a pensar no algo definitivo por ahora no creeo necesario el cambio)
+# 5. FALTA DOCUMENTAR MUCHAS FUNCIONES (escribir que hacen entre " " para el comando help)
 
 # Funciones Principales
 
