@@ -1,25 +1,26 @@
 from datetime import datetime
 
+#QUE FALTA: 
+# 1. HISTORIAL 
+# 2.FUNCION PARA CAMBIAR PRECIOS DE PRODUCTOS, LA MISMA SE PODRIA SUMAR A LA FUNCION BAJAS Y PODRIAMOS RENOMBRARLA COMO FUNCION MODIFICAR PRODUCTO
+# 3. QUE LA FUNCION DAR DE BAJA TENGA UN CICLO WHILE
+# 4. podriamos conciderar la opcion de dar un menu de categorias pre-definidas (es algo a pensar no algo definitivo por ahora no creeo necesario el cambio)
+
 # Funciones Principales
-
-
 
 def crear_inventario():
     """Crea y devuelve el inventario inicial. El inventario llevara el siguiente orden de caracteristicas: [codigo, sub categoria, nombre, fecha de vencimiento, costo, cantidad"""
     return [[123456789, 'lacteos', 'Leche entera la Scerenisima por 1l', '2027/12/30', 3000, 200],
-            [987654321, 'lacteos', 'Queso muzzarela La Blanca por 500gm', '2027/09/20', 7000, 120]]
-
+            [987654321, 'lacteos', 'Queso muzzarela La Blanca por 500gm', '2026/09/20', 7000, 120]]
 
 def validar_no_es_vacio(cadena):
     """Valida que la cadena ingresada no esté vacía"""
-
     while cadena == "": 
         cadena = input("El valor no puede estar vacío. Ingrese nuevamente: ")
     return cadena
 
 def validar_numero(num):
     """Valida que el numero ingresado sea positivo y valido"""
-
     num = validar_no_es_vacio(num)
     while not num.isdigit() or int(num) <= 0:
         num = input("Ingrese un numero positivo y valido: ")
@@ -31,10 +32,15 @@ def validar_codigo(cod):
     while len(cod) != 9:
         cod = input("Ingrese un codigo de nueve (9) caracteres: ")
     return(cod)
+
+def validar_codigo_existe(codigo):
+    for producto in inventario:
+        while str(producto[0]) == str(codigo):
+            codigo = input("Ya existe un producto con el codigo", codigo, "Ingrese un codigo valido:")
+        return codigo
     
 def validar_fecha(fecha):
     """Valida que la fecha ingresada esté en el formato AAAA/MM/DD y no sea una fecha pasada"""
-
     fecha = validar_no_es_vacio(fecha)
     valido = False
 
@@ -82,17 +88,6 @@ def validar_fecha(fecha):
         fecha = input("Ingrese nuevamente (YYYY-MM-DD): ")
     return fecha
 
-def fecha_a_numero(dia, mes, anio):
-    # Convierte una fecha a una cantidad de dias transcurridos desde el
-    # año 1, para poder comparar dos fechas sin usar datetime.strptime.
-    total_dias = 0
-    for a in range(1, anio):
-        total_dias = total_dias + (366 if es_bisiesto(a) else 365)
-    for m in range(1, mes):
-        total_dias = total_dias + dias_en_mes(m, anio)
-    total_dias = total_dias + dia
-    return total_dias
-
 def imprimir_inventario(inventario):
     "la funcion imprimir_inventario muestra por terminal todos los productos, con sus categorias, que se encuentren en el inventario"
     print("Productos registrados en el inventario:")
@@ -101,15 +96,9 @@ def imprimir_inventario(inventario):
         print(i+1,". Codigo de identificacion: ", producto[0],'\n' " Categoria: ", producto[1], '\n' " Nombre : ", producto[2],'\n' " Fecha de vencimiento: ", producto[3],'\n' " Costo: $", producto[4], '\n'" Cantidad disponibles: ", producto[5])
     if inventario == [ ]:
         print("No hay productos registrados en el inventario.")
-
-def codigo_existe(codigo):
-    for producto in inventario:
-        while str(producto[0]) == str(codigo):
-            codigo = input("Ya existe un producto con el codigo", codigo, "Ingrese un codigo valido:")
-        return codigo
-    
+  
 def agregar_producto(inventario, codigo, sub_categoria, nombre, fecha_de_vencimiento, costo, cantidad):
-    codigo_existe(codigo)
+    validar_codigo_existe(codigo)
     producto = [codigo, sub_categoria, nombre, fecha_de_vencimiento, costo, cantidad]
     inventario.append(producto)
     print("Se a agregado el producto.",producto[2],"con éxito.")
@@ -130,7 +119,7 @@ def dar_de_baja(codigo, cantidad_baja):
                 print("No es posible eliminar más unidades de las que se encuentran disponibles en el inventario ")
     print("No se encontro ningun producto con el codigo", codigo)
 
-def buscar_producto(termino):
+def buscar_producto(termino, inventario):
     encontrados = []
     for producto in inventario:
         if termino.lower() in str(producto[0]).lower() or termino.lower() in producto[2].lower():
@@ -144,7 +133,57 @@ def buscar_producto(termino):
             print("- Codigo:", producto[0], " Nombre:", producto[2], " Categoria:", producto[1],
                   " Costo: $", producto[4], " Cantidad:", producto[5])
 
-def imprimir_por_categoria(categoria):
+def Fecha_proxima_a_vencer(dias):
+    hoy = datetime.now()
+    anio_limite = int(str(hoy)[:4])
+    mes_limite = int(str(hoy)[5:7])
+    dia_limite = int(str(hoy)[8:10])
+
+    dia_limite += dias
+
+    while True:
+        if mes_limite in [1, 3, 5, 7, 8, 10, 12]:
+            max_dias = 31
+        elif mes_limite in [4, 6, 9, 11]:
+            max_dias = 30
+        else:
+            if (anio_limite % 4 == 0 and anio_limite % 100 != 0) or (anio_limite % 400 == 0):
+                max_dias = 29
+            else:
+                max_dias = 28
+
+        if dia_limite > max_dias:
+            dia_limite -= max_dias
+            mes_limite += 1
+            if mes_limite > 12:
+                mes_limite = 1
+                anio_limite += 1
+
+        return anio_limite, mes_limite, dia_limite
+
+def productos_proximos_a_vencer(inventario, dias):
+    anio_limite, mes_limite, dia_limite = Fecha_proxima_a_vencer(dias)
+    encontrados = []
+    for producto in inventario:
+        anio_ven, mes_ven, dia_ven = producto[3].split("/")
+        anio_ven, mes_ven, dia_ven = int(anio_ven), int(mes_ven), int(dia_ven)
+
+        if anio_ven < anio_limite:
+            encontrados.append(producto)
+        elif anio_ven == anio_limite and mes_ven < mes_limite:
+            encontrados.append(producto)
+        elif anio_ven == anio_limite and mes_ven == mes_limite and dia_ven < dia_limite:
+            encontrados.append(producto)
+
+    if encontrados == []:
+        print("No se han encontrado productos")
+    else:
+        for producto in encontrados:
+            print(producto)
+
+
+def imprimir_por_categoria(categoria, inventario):
+
     encontrados = []
     for producto in inventario:
         if producto[1].lower() == categoria.lower():
@@ -152,8 +191,7 @@ def imprimir_por_categoria(categoria):
 
     if encontrados == []:
         print("No hay productos registrados en la categoria", categoria)
-        return
-
+        
     print("Stock disponible en la categoria", categoria, ":")
     total_categoria = 0
     for producto in encontrados:
@@ -162,29 +200,11 @@ def imprimir_por_categoria(categoria):
     print("Total de unidades en", categoria, ":", total_categoria)
 
 def valorizar_inventario():
+    "La funcion se encarga de computar el precio de cada producto por la cantidad disponible del mismo y asi devolver el valor total de los activos del inventario"
     total = 0
     for producto in inventario:
-        total = total + (producto[4] * producto[5])
+        total += (producto[4] * producto[5])
     print("Valor total del inventario: $", total)
-
-def productos_por_vencer(dias_limite):
-    hoy = datetime.now() 
-    hoy_numero = fecha_a_numero(hoy.day, hoy.month, hoy.year)
-
-    print("Productos que vencen dentro de los proximos", dias_limite, "dias:")
-    encontrados = False
-
-    for producto in inventario:
-        dia, mes, anio = producto[3].split("/")
-        venc_numero = fecha_a_numero(int(dia), int(mes), int(anio))
-        dias_restantes = venc_numero - hoy_numero
-
-        if dias_restantes >= 0 and dias_restantes <= dias_limite:
-            print("-", producto[2], "vence en", dias_restantes, "dia(s) (", producto[3], ")")
-            encontrados = True
-
-    if encontrados == False:
-        print("No hay productos por vencer en ese rango.")
 
 def mostrar_menu():
     print("Menu de inicio")
@@ -207,7 +227,6 @@ while opcion != 8:
 
     if opcion == 1:
         imprimir_inventario(inventario)
-
     elif opcion == 2:
         codigo_producto = validar_codigo(input("Ingrese el codigo del producto: "))
         categoria = input("Ingrese la categoria del producto: ")
@@ -223,10 +242,8 @@ while opcion != 8:
         buscar_producto()
         #no estoy convencida de la funcion yo pondria un menu de busqueda
     elif opcion == 5:
-        dias = input("Ingrese la cantidad de dias a partir de los cuales",'\n', "se considera al producto pronto a vences.",'\n', "(ejemplo: dentro de los proximos 3 meses, seria 90 dias) ")
-        productos_por_vencer(dias)
-        # esta funcion tambien me gustaria cambiarla ya que tiene a mi parecer demaciadas sub funciones
-
+        dias = validar_numero(input("Ingrese la cantidad de dias a futuro para revisar vencimientos: "))
+        productos_proximos_a_vencer(inventario, dias)
     elif opcion == 6:
         categoria = input("Ingrese la categoria a consultar (ej: lacteos, higiene): ")
         imprimir_por_categoria(categoria)
