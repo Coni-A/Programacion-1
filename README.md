@@ -1,6 +1,6 @@
 # Programacion-1
 
-Sistema de gestion de inventarios:
+*Sistema de gestion de inventarios:*
 - fecha de vencimiento
 - codigo de identificacion
 - costo
@@ -31,6 +31,12 @@ Sistema de gestion de inventarios:
 - funcion verificacion no es vacio (funciona)
 - funcion verificacion de codigo (funciona)
 
-hay que crear un historial, imagino que deberiamos poner codigo de producto, fecha de baja, cantidad, precio unitario y precio total
+*QUE FALTA:*
+ - FUNCION PARA CAMBIAR PRECIOS DE PRODUCTOS, LA MISMA SE PODRIA SUMAR A LA FUNCION BAJAS Y PODRIAMOS RENOMBRARLA COMO FUNCION MODIFICAR PRODUCTO
+ - QUE LA FUNCION DAR DE BAJA TENGA UN CICLO WHILE Y HAY QUE AGREGARLE EL HISORIAL
+ - podriamos conciderar la opcion de dar un menu de categorias pre-definidas (es algo a pensar no algo definitivo por ahora no creeo necesario el cambio)
+ - PENSANDO EN UN FUTURO PODRIAMOS CREAR UNA FUNCION DE ANALISIS DE DATOS DONDE LEYENDO EL HISTORIAL SE PODRIA IMPRIMIR LOS PRODUCTOS MAS VENDIDOS, ETC.
+ - HABRIA QUE RECONSIDERAR EL CODIGO DE IDENTIFICACION PORQUR VALIDAMOS QUE SEA UNICO CUANDO DEVERIAMOS VALIDAR QUE EL MISMO NO SE REPITA PARA UN PRODUCTO DE NOMBRE DISTINTO
+
 
 
