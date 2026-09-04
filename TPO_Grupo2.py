@@ -285,7 +285,7 @@ def valorizar_inventario(inventario):
     else:
         for producto in inventario:
             total += (producto[4] * producto[5])
-            print("Valor total del inventario: $", total)
+        print("Valor total del inventario: $", total)
 
 
 def estadisticas_productos_disponibles(inventario):
