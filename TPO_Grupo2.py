@@ -90,7 +90,38 @@ def crear_inventario():
     """Crea y devuelve el inventario inicial."""
     #El inventario llevara el siguiente orden de caracteristicas: [codigo, sub categoria, nombre, fecha de vencimiento, costo, cantidad]
     return [[123456789, 'lacteos', 'Leche entera la Scerenisima por 1l', '2027/12/30', 3000, 200],
-            [987654321, 'lacteos', 'Queso muzzarela La Blanca por 500gm', '2026/09/20', 7000, 120]]
+            [987654321, 'lacteos', 'Queso muzzarela La Blanca por 500gm', '2026/09/20', 7000, 120],
+            [579246813,'limpieza','Desinfectante Lysoform por 360ml','2028/12/05',4200,70],
+            [123456789,'lacteos','Leche entera La Serenisima por 1l','2027/12/30',3000,200],
+            [813579246,'conservas','Pure de tomate Arcor por 520gm','2028/11/20',1900,150],
+            [369258147,'lacteos','Crema de leche Tregar por 200ml','2026/10/08',2200,90],
+            [246813579,'limpieza','Detergente Magistral por 750ml','2029/01/20',2800,100],
+            [753159456,'almacen','Azucar Ledesma por 1kg','2028/03/25',1700,210],
+            [987654321,'lacteos','Queso muzzarela La Blanca por 500gm','2026/09/20',7000,120],
+            [135792468,'limpieza','Lavandina Ayudin por 1l','2028/09/15',1800,130],
+            [456123789,'almacen','Aceite Cocinero por 1.5l','2027/10/12',4200,140],
+            [852369741,'bebidas','Agua saborizada Levite por 1.5l','2027/07/22',2300,175],
+            [159357258,'galletitas','Galletitas Criollitas por 100gm','2027/06/28',1500,180],
+            [951753852,'almacen','Harina Pureza 000 por 1kg','2027/11/30',1600,190],
+            [321654987,'galletitas','Galletitas Oreo por 117gm','2027/04/20',2200,160],
+            [468135792,'limpieza','Jabon liquido Ala por 800ml','2029/02/10',3500,80],
+            [654789321,'bebidas','Jugo Baggio de naranja por 1l','2027/03/18',2500,100],
+            [753951456,'galletitas','Galletitas Pepitos por 118gm','2027/07/05',2300,145],
+            [258456123,'bebidas','Gaseosa Pepsi por 2.25l','2027/05/20',4000,130],
+            [924681357,'conservas','Choclo en lata Arcor por 350gm','2029/04/10',2500,110],
+            [741852963,'lacteos','Manteca La Paulina por 200gm','2026/11/25',2800,75],
+            [147258369,'almacen','Arroz Gallo Oro por 1kg','2028/01/15',2500,180],
+            [135468792,'conservas','Arvejas La Campagnola por 350gm','2029/06/25',2100,95],
+            [789456123,'galletitas','Galletitas Chocolinas por 170gm','2027/05/15',1900,200],
+            [357951456,'bebidas','Agua mineral Villavicencio por 1.5l','2027/08/10',1800,250],
+            [852147963,'galletitas','Galletitas Opera por 92gm','2027/08/18',2100,125],
+            [456789123,'lacteos','Yogur de vainilla La Serenisima por 1l','2026/10/15',3500,85],
+            [681357924,'limpieza','Esponja Scotch-Brite por unidad','2029/05/30',1500,200],
+            [369147258,'almacen','Fideos Matarazzo tirabuzon por 500gm','2028/02/10',1800,220],
+            [246579813,'conservas','Duraznos en almibar Arcor por 820gm','2029/02/28',4500,65],
+            [159753486,'bebidas','Gaseosa Coca Cola por 2.25l','2027/06/15',4500,150],
+            [468135792,'limpieza','Jabon liquido Ala por 800ml','2029/07/10',3500,80]
+            ]
 
 def crear_historial():
     """Crea y devuelve un historial de los movimientos (bajas y altas) de los productos."""
@@ -138,6 +169,7 @@ def dar_de_baja(historial, inventario, codigo, cantidad_baja, hoy):
         print("No se encontro ningun producto con el codigo", codigo)         
 
 def Modificar_producto(inventario, codigo, opcion, nuevo_valor):
+    """Modifica o actualiza una categoria en especifico de un producto"""
     encontrado = False
     for producto in inventario:
         if str(producto[0]) == str(codigo):
@@ -248,9 +280,13 @@ def imprimir_historial(historial):
 def valorizar_inventario(inventario):
     "La funcion se encarga de computar el precio de cada producto por la cantidad disponible del mismo y asi devolver el valor total de los activos del inventario"
     total = 0
-    for producto in inventario:
-        total += (producto[4] * producto[5])
-    print("Valor total del inventario: $", total)
+    if inventario == []:
+        print("No hay productos registrados en el inventario")
+    else:
+        for producto in inventario:
+            total += (producto[4] * producto[5])
+            print("Valor total del inventario: $", total)
+
 
 def estadisticas_productos_disponibles(inventario):
     """Calcula y muestra las categorias con mayor cantidad de productos disponibles"""
