@@ -28,8 +28,8 @@
 
 *QUE FALTA:*
 - podriamos conciderar la opcion de dar un menu de categorias pre-definidas (es algo a pensar no algo definitivo por ahora no creeo necesario el cambio)
--  PENSANDO EN UN FUTURO PODRIAMOS CREAR UNA FUNCION DE ANALISIS DE DATOS DONDE LEYENDO EL HISTORIAL SE PODRIA IMPRIMIR LOS PRODUCTOS MAS VENDIDOS, ETC.
 - HAY QUE TESTEAR MUCHO
-
+- la funcion estadisticas no me convence, si quieren agregarle algo grafico tipo que se forme un grafico de barras estaria buenisimo pero creo que quedaria mejorsi ya predefinimos las categorias 
+- nuestro sistema esta orientado a gestion no venta y por lo tanto no incluyo el termino venta, si lo hacemos en cuanto a ventas habria que incluir facturacion
 
 

@@ -1,9 +1,10 @@
 from datetime import datetime
 
 #QUE FALTA: 
-# . podriamos conciderar la opcion de dar un menu de categorias pre-definidas (es algo a pensar no algo definitivo por ahora no creeo necesario el cambio)
-# . PENSANDO EN UN FUTURO PODRIAMOS CREAR UNA FUNCION DE ANALISIS DE DATOS DONDE LEYENDO EL HISTORIAL SE PODRIA IMPRIMIR LOS PRODUCTOS MAS VENDIDOS, ETC.
-# . TESTEAR 
+#- podriamos conciderar la opcion de dar un menu de categorias pre-definidas (es algo a pensar no algo definitivo por ahora no creeo necesario el cambio)
+#- HAY QUE TESTEAR MUCHO
+#- la funcion estadisticas no me convence, si quieren agregarle algo grafico tipo que se forme un grafico de barras estaria buenisimo pero creo que quedaria mejorsi ya predefinimos las categorias 
+#- nuestro sistema esta orientado a gestion no venta y por lo tanto no incluyo el termino venta, si lo hacemos en cuanto a ventas habria que incluir facturacion
 
 # Funciones de validacion 
 def validar_no_es_vacio(cadena):
@@ -146,14 +147,14 @@ def Modificar_producto(inventario, codigo, opcion, nuevo_valor):
             elif opcion == 2:   # precio
                 producto[4] = validar_no_es_vacio(nuevo_valor)
             elif opcion == 3:   # cantidad
-                producto[5] = validar_fecha(nuevo_valor)
+                producto[5] = validar_no_es_vacio(nuevo_valor)
             print("Se a modificado el producto",producto[2], "con éxito.")
 
     if not encontrado:
         print("No se encontraron productos con este codigo para modificar.")
     
 
-def buscar_producto(termino, inventario):
+def buscar_producto(inventario, termino):
     """Busca un producto en el inventario por codigo o por nombre"""
     encontrados = []
     for producto in inventario:
@@ -218,7 +219,7 @@ def productos_proximos_a_vencer(inventario, dias):
         for producto in encontrados:
             print(producto)
 
-def imprimir_por_categoria(categoria, inventario):
+def imprimir_por_categoria(inventario, categoria):
     """Imprime todos los productos del inventario de la categoria seleccionada"""
     encontrados = []
     for producto in inventario:
@@ -251,8 +252,30 @@ def valorizar_inventario(inventario):
         total += (producto[4] * producto[5])
     print("Valor total del inventario: $", total)
 
-def estadisticas_ventas(historial):
-    pass
+def estadisticas_productos_disponibles(inventario):
+    """Calcula y muestra las categorias con mayor cantidad de productos disponibles"""
+    if inventario == [ ]:
+        print("No hay productos registrados en el inventario.")
+    else:
+        categorias_lista = []
+        for producto in inventario:
+            categoria = producto[1].lower()
+            cantidad = producto[5]
+            encontrado = False
+            for item in categorias_lista:
+                if item[0] == categoria:
+                    item[1] += cantidad
+                    encontrado = True
+            if not encontrado:
+                categorias_lista.append([categoria, cantidad])
+        for i in range(len(categorias_lista)):
+            for j in range(len(categorias_lista) - 1 - i):
+                if categorias_lista[j][1] < categorias_lista[j + 1][1]:
+                    categorias_lista[j], categorias_lista[j + 1] = categorias_lista[j + 1], categorias_lista[j]
+        print("Estadisticas de categorias con mayor cantidad de productos disponibles:")
+        for i, categoria in enumerate(categorias_lista):
+            print(i + 1, ". Categoria:", categoria[0])
+            print("   Unidades totales:", categoria[1])
 
 def imprimir_menu():
     """Imprime el menu con sus opciones"""
@@ -266,7 +289,7 @@ def imprimir_menu():
     print("7.  Imprimir stock por categoria")
     print("8.  Imprimir Historial")
     print("9.  Valorizar inventario")
-    print("10. Estadisticas de ventas")
+    print("10. Estadisticas de productos disponibles")
     print("11. Salir")
 
 # Programa principal 
@@ -316,7 +339,7 @@ while opcion != 11:
     elif opcion == 9:
         valorizar_inventario(inventario)
     elif opcion == 10:
-        estadisticas_ventas(historial)
+        estadisticas_productos_disponibles(inventario)
     else: 
         print("Opción inválida. Intente nuevamente.")
 
