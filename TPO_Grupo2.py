@@ -1,7 +1,6 @@
 from datetime import datetime
 
 #QUE FALTA: 
-# . HAY QUE HACER UNA FUNCION QUE MODIFIQUE LOS PRODUCTOS (creo que podria modificar precio sub_categoria y cantidad por si se equivoco a la hora ingresar un producto nuevo)
 # . podriamos conciderar la opcion de dar un menu de categorias pre-definidas (es algo a pensar no algo definitivo por ahora no creeo necesario el cambio)
 # . PENSANDO EN UN FUTURO PODRIAMOS CREAR UNA FUNCION DE ANALISIS DE DATOS DONDE LEYENDO EL HISTORIAL SE PODRIA IMPRIMIR LOS PRODUCTOS MAS VENDIDOS, ETC.
 # . TESTEAR 
@@ -95,7 +94,7 @@ def crear_inventario():
 def crear_historial():
     """Crea y devuelve un historial de los movimientos (bajas y altas) de los productos."""
     #El historial llevara el siguiente orden : [codigo, sub categoria, nombre, fecha de movimiento, precio unitario, precio total, cantidad]
-    #En caso de ser una baja deveria figurar un signo '-' (menos o negativo) en la cantidad 
+    #En caso de ser una baja la misma figura con un signo '-' (menos o negativo) en la cantidad 
     return [[123456789, 'lacteos', 'Leche entera la Scerenisima por 1l', '2026/07/30', 3000, 600000, 200],
             [987654321, 'lacteos', 'Queso muzzarela La Blanca por 500gm', '2026/03/20', 7000, 140000, -20]]
 
@@ -112,33 +111,16 @@ def agregar_producto(inventario, codigo, sub_categoria, nombre, fecha_de_vencimi
     """Agrega un nuevo producto al inventario"""
     validar_producto_existente(codigo, nombre)
     costo_total = cantidad*costo
-    inventario.extend([codigo, sub_categoria, nombre, fecha_de_vencimiento, costo, cantidad])
-    historial.extend([codigo, sub_categoria, nombre, hoy, costo, costo_total, cantidad])
+    inventario.append([codigo, sub_categoria, nombre, fecha_de_vencimiento, costo, cantidad])
+    historial.append([codigo, sub_categoria, nombre, hoy, costo, costo_total, cantidad])
     print("Se a agregado el producto.", nombre,"con éxito.")
 
 def dar_de_baja(historial, inventario, codigo, cantidad_baja, hoy):
     """Da de baja una cantidad de productos del inventario, en caso de bajar el total de un producto el mismo se elimina del inventario"""
+    encontrado = False
     for producto in inventario:
         if str(producto[0]) == str(codigo):
-            if cantidad_baja == producto[5]:
-                costo_total = cantidad*costo
-                inventario.remove(producto)
-                historial.extend([codigo, producto[1], producto[2], hoy, producto[4], costo_total, - cantidad])
-                print("Se elimino el producto", producto[2], "del inventario (stock en 0).")
-            elif cantidad_baja< producto[5]:
-                costo_total = cantidad*costo
-                producto[5] = producto[5] - cantidad_baja
-                historial.extend([codigo, producto[1], producto[2], hoy, producto[4], costo_total, - cantidad])
-                print("Se dieron de baja", cantidad_baja, "unidad(es) de", producto[2], ". Quedan", producto[5], ".")
-            else:
-                print("No es posible eliminar más unidades de las que se encuentran disponibles en el inventario ")
-    print("No se encontro ningun producto con el codigo", codigo)
-
-
-def dar_de_baja(historial, inventario, codigo, cantidad_baja, hoy):
-    """Da de baja una cantidad de productos del inventario, en caso de bajar el total de un producto el mismo se elimina del inventario"""
-    for producto in inventario:
-        if str(producto[0]) == str(codigo):
+            encontrado = True
             costo_total = cantidad_baja * producto[4]
             if cantidad_baja == producto[5]:
                 historial.append([codigo, producto[1], producto[2], hoy, producto[4], costo_total, -cantidad_baja])
@@ -149,12 +131,27 @@ def dar_de_baja(historial, inventario, codigo, cantidad_baja, hoy):
                 historial.append([codigo, producto[1], producto[2], hoy, producto[4], costo_total, -cantidad_baja])
                 print("Se dieron de baja", cantidad_baja, "unidad(es) de", producto[2], ". Quedan", producto[5], ".")
             else:
-                print("No es posible eliminar más unidades de las que se encuentran disponibles en el inventario ")          
-    else:
-        print("No se encontro ningun producto con el codigo", codigo)           
+                print("No es posible eliminar más unidades de las que se encuentran disponibles en el inventario ")
 
-def Modificar_producto():
-    pass
+    if not encontrado:
+        print("No se encontro ningun producto con el codigo", codigo)         
+
+def Modificar_producto(inventario, codigo, opcion, nuevo_valor):
+    encontrado = False
+    for producto in inventario:
+        if str(producto[0]) == str(codigo):
+            encontrado = True
+            if opcion == 1:   # sub-categoria
+                producto[1] = validar_no_es_vacio(nuevo_valor)
+            elif opcion == 2:   # precio
+                producto[4] = validar_no_es_vacio(nuevo_valor)
+            elif opcion == 3:   # cantidad
+                producto[5] = validar_fecha(nuevo_valor)
+            print("Se a modificado el producto",producto[2], "con éxito.")
+
+    if not encontrado:
+        print("No se encontraron productos con este codigo para modificar.")
+    
 
 def buscar_producto(termino, inventario):
     """Busca un producto en el inventario por codigo o por nombre"""
@@ -221,7 +218,6 @@ def productos_proximos_a_vencer(inventario, dias):
         for producto in encontrados:
             print(producto)
 
-
 def imprimir_por_categoria(categoria, inventario):
     """Imprime todos los productos del inventario de la categoria seleccionada"""
     encontrados = []
@@ -255,18 +251,23 @@ def valorizar_inventario(inventario):
         total += (producto[4] * producto[5])
     print("Valor total del inventario: $", total)
 
+def estadisticas_ventas(historial):
+    pass
+
 def imprimir_menu():
     """Imprime el menu con sus opciones"""
     print("Menu de inicio")
-    print("1. Mostrar inventario")
-    print("2. Agregar producto")
-    print("3. Dar de baja producto")
-    print("4. Buscar producto")
-    print("5. Ver productos por vencer")
-    print("6. Imprimir stock por categoria")
-    print("7. Imprimir Historial")
-    print("8. Valorizar inventario")
-    print("9. Salir")
+    print("1.  Mostrar inventario")
+    print("2.  Agregar producto")
+    print("3.  Dar de baja producto")
+    print("4.  Modificar producto")
+    print("5.  Buscar producto")
+    print("6.  Ver productos por vencer")
+    print("7.  Imprimir stock por categoria")
+    print("8.  Imprimir Historial")
+    print("9.  Valorizar inventario")
+    print("10. Estadisticas de ventas")
+    print("11. Salir")
 
 # Programa principal 
 inventario = crear_inventario()
@@ -276,8 +277,7 @@ print("\n")
 print("Sistema de gestion de inventario")
 imprimir_menu()
 opcion = validar_numero(input("Elija una opción: "))
-while opcion != 9:
-
+while opcion != 11:
     if opcion == 1:
         imprimir_inventario(inventario)
     elif opcion == 2:
@@ -291,22 +291,32 @@ while opcion != 9:
     elif opcion == 3:
         codigo = validar_codigo(input("Ingrese el codigo del producto a dar de baja: "))
         cantidad = validar_numero(input("Ingrese la cantidad de unidades que quiera dar de baja:"))
-        
         dar_de_baja(historial, inventario, codigo, cantidad, hoy)
     elif opcion == 4:
+        codigo = validar_codigo(input("Ingrese el codigo del producto a modificar: "))
+        print("1. Subcategoria \n2. Precio \n3. Cantidad \n4. Salir")
+        opcion_mod = validar_numero(input("¿Qué desea modificar?: "))
+        while opcion_mod < 1 or opcion_mod > 4: 
+            opcion_mod = validar_numero(input("Opción inválida. Ingrese una opción válida: "))
+        if opcion_mod != 4: 
+            nuevo_valor = input("Ingrese el nuevo valor: ")
+            Modificar_producto(inventario, codigo, opcion_mod, nuevo_valor)
+    elif opcion == 5:
         Producto = input("Ingrese el nombre o codigo del producto a buscar ")
         buscar_producto(inventario, Producto)
         #no estoy convencida de la funcion yo pondria un menu de busqueda
-    elif opcion == 5:
+    elif opcion == 6:
         dias = validar_numero(input("Ingrese la cantidad de dias a futuro para revisar vencimientos: "))
         productos_proximos_a_vencer(inventario, dias)
-    elif opcion == 6:
+    elif opcion == 7:
         categoria = input("Ingrese la categoria a consultar (ej: lacteos, higiene): ")
         imprimir_por_categoria(inventario, categoria)
-    elif opcion == 7:
-        imprimir_historial(historial)
     elif opcion == 8:
+        imprimir_historial(historial)
+    elif opcion == 9:
         valorizar_inventario(inventario)
+    elif opcion == 10:
+        estadisticas_ventas(historial)
     else: 
         print("Opción inválida. Intente nuevamente.")
 
