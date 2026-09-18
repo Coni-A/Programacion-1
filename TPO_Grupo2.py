@@ -177,9 +177,9 @@ def Modificar_producto(inventario, codigo, opcion, nuevo_valor):
             if opcion == 1:   # sub-categoria
                 producto[1] = validar_no_es_vacio(nuevo_valor)
             elif opcion == 2:   # precio
-                producto[4] = validar_no_es_vacio(nuevo_valor)
+                producto[4] = validar_numero(nuevo_valor)
             elif opcion == 3:   # cantidad
-                producto[5] = validar_no_es_vacio(nuevo_valor)
+                producto[5] = validar_numero(nuevo_valor)
             print("Se a modificado el producto",producto[2], "con éxito.")
 
     if not encontrado:
