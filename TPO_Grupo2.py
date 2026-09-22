@@ -1,11 +1,5 @@
 from datetime import datetime
 
-#QUE FALTA: 
-#- podriamos conciderar la opcion de dar un menu de categorias pre-definidas (es algo a pensar no algo definitivo por ahora no creeo necesario el cambio)
-#- HAY QUE TESTEAR MUCHO
-#- la funcion estadisticas no me convence, si quieren agregarle algo grafico tipo que se forme un grafico de barras estaria buenisimo pero creo que quedaria mejorsi ya predefinimos las categorias 
-#- nuestro sistema esta orientado a gestion no venta y por lo tanto no incluyo el termino venta, si lo hacemos en cuanto a ventas habria que incluir facturacion
-
 # Funciones de validacion 
 def validar_no_es_vacio(cadena):
     """Valida que la cadena ingresada no esté vacía"""
