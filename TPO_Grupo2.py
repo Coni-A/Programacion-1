@@ -10,8 +10,18 @@ def validar_no_es_vacio(cadena):
 def validar_numero(numero):
     """Valida que el numero ingresado sea positivo y valido"""
     numero = validar_no_es_vacio(numero)
-    while not numero.isdigit() or int(numero) <= 0:
+    es_numero = numero.isdigit()
+    if es_numero:
+        es_positivo = int(numero) > 0
+    else:
+        es_positivo = False
+    while es_numero == False or es_positivo == False:
         numero = input("Ingrese un numero positivo y valido: ")
+        es_numero = numero.isdigit()
+        if es_numero:
+            es_positivo = int(numero) > 0
+        else:
+            es_positivo = False
     return int(numero)
 
 def validar_codigo(codigo):
@@ -30,7 +40,7 @@ def validar_producto_existente(codigo, nombre):
     return codigo, nombre
     
 def validar_fecha(fecha):
-    """Valida que la fecha ingresada este en el formato AAAA/MM/DD y no sea una fecha pasada"""
+    """Valida que la fecha ingresada esté en el formato AAAA/MM/DD y no sea una fecha pasada"""
     fecha = validar_no_es_vacio(fecha)
     valido = False
 
@@ -39,43 +49,49 @@ def validar_fecha(fecha):
     hoy_mes = int(str(hoy)[5:7])
     hoy_dia = int(str(hoy)[8:10])
 
-    while not valido:
+    while valido == False:
         
-        if len(fecha) == 10 and fecha[4] == '/' and fecha[7] == '/' and fecha[:4].isdigit() and fecha[5:7].isdigit() and fecha[8:].isdigit():
-
+        if (len(fecha) == 10 and fecha[4] == '/' and fecha[7] == '/' and fecha[:4].isdigit() and fecha[5:7].isdigit() and fecha[8:].isdigit()):
+            
             anio = int(fecha[:4])
             mes = int(fecha[5:7])
             dia = int(fecha[8:])
 
+            # Validaciones de mes y día
             if mes < 1 or mes > 12:
                 print("El mes ingresado no es válido.")
+                valido = False
             elif mes in [1, 3, 5, 7, 8, 10, 12] and (dia < 1 or dia > 31):
                 print("El día no es válido para ese mes.")
+                valido = False
             elif mes in [4, 6, 9, 11] and (dia < 1 or dia > 30):
                 print("El día no es válido para ese mes.")
+                valido = False
             elif mes == 2:
                 if (anio % 4 == 0 and anio % 100 != 0) or (anio % 400 == 0):
                     if dia < 1 or dia > 29:
                         print("El día no es válido para febrero en año bisiesto.")
+                        valido = False
                     else:
                         valido = True
                 else:
                     if dia < 1 or dia > 28:
                         print("El día no es válido para febrero.")
+                        valido = False
                     else:
                         valido = True
             else:
                 valido = True
-
             if valido:
-                if (anio < hoy_anio) or (anio == hoy_anio and mes < hoy_mes) or (anio == hoy_anio and mes == hoy_mes and dia < hoy_dia):
+                fecha_pasada = ((anio < hoy_anio) or (anio == hoy_anio and mes < hoy_mes) or (anio == hoy_anio and mes == hoy_mes and dia < hoy_dia))
+                if fecha_pasada:
                     print("La fecha ingresada ya pasó.")
                     valido = False
                 else:
                     return fecha
         else:
             print("El formato no es válido.")
-        fecha = input("Ingrese nuevamente (YYYY-MM-DD): ")
+        fecha = input("Ingrese nuevamente (AAAA/MM/DD): ")
     return fecha
 
 #Funciones principales 
@@ -191,7 +207,8 @@ def Fecha_proxima_a_vencer(dias):
 
     dia_limite += dias
 
-    while True:
+    excede_mes = True
+    while excede_mes:
         if mes_limite in [1, 3, 5, 7, 8, 10, 12]:
             max_dias = 31
         elif mes_limite in [4, 6, 9, 11]:
@@ -208,8 +225,9 @@ def Fecha_proxima_a_vencer(dias):
             if mes_limite > 12:
                 mes_limite = 1
                 anio_limite += 1
-
-        return anio_limite, mes_limite, dia_limite
+        else:
+            excede_mes = False
+    return anio_limite, mes_limite, dia_limite
 
 def productos_proximos_a_vencer(inventario, dias):
     """Compara e imprime los productos con una fecha de vencimiento menor a la fecha limite"""
