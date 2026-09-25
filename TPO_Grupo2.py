@@ -24,10 +24,10 @@ def validar_codigo(codigo):
 def validar_producto_existente(codigo, nombre):
     """Valida que el codigo ingresado se unico para el producto al que se le asigna y no se repita en el inventario"""
     for producto in inventario:
-        while str(producto[0]) == str(codigo) and str(producto[2]) != str(nombre):
-            codigo = input("El codigo no coincide con el nombre del producto ingresado.", '\n' "Ingrese el codigo nuevamente:")
-            nombre = input("Ingrese el nombre nuevamente:")
-        return codigo, nombre
+        if str(producto[0]) == str(codigo) and str(producto[2]) != str(nombre):
+            codigo = input("El codigo no coincide con el nombre del producto ingresado. Ingrese el codigo nuevamente: ")
+            nombre = input("Ingrese el nombre nuevamente: ")
+    return codigo, nombre
     
 def validar_fecha(fecha):
     """Valida que la fecha ingresada este en el formato AAAA/MM/DD y no sea una fecha pasada"""
@@ -122,7 +122,7 @@ def imprimir_inventario(inventario):
   
 def agregar_producto(inventario, codigo, sub_categoria, nombre, fecha_de_vencimiento, costo, cantidad, historial,hoy):
     """Agrega un nuevo producto al inventario"""
-    validar_producto_existente(codigo, nombre)
+    codigo, nombre = validar_producto_existente(codigo, nombre)
     costo_total = cantidad*costo
     inventario.append([codigo, sub_categoria, nombre, fecha_de_vencimiento, costo, cantidad])
     historial.append([codigo, sub_categoria, nombre, hoy, costo, costo_total, cantidad])
