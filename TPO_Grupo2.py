@@ -355,7 +355,6 @@ while opcion != 11:
     elif opcion == 5:
         Producto = input("Ingrese el nombre o codigo del producto a buscar ")
         buscar_producto(inventario, Producto)
-        #no estoy convencida de la funcion yo pondria un menu de busqueda
     elif opcion == 6:
         dias = validar_numero(input("Ingrese la cantidad de dias a futuro para revisar vencimientos: "))
         productos_proximos_a_vencer(inventario, dias)
