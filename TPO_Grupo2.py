@@ -131,42 +131,42 @@ def agregar_producto(inventario, codigo, sub_categoria, nombre, fecha_de_vencimi
 def dar_de_baja(historial, inventario, codigo, cantidad_baja, hoy):
     """Da de baja una cantidad de productos del inventario, en caso de bajar el total de un producto el mismo se elimina del inventario"""
     encontrado = False
+
     for producto in inventario:
         if str(producto[0]) == str(codigo):
             encontrado = True
             costo_total = cantidad_baja * producto[4]
+
             if cantidad_baja == producto[5]:
                 historial.append([codigo, producto[1], producto[2], hoy, producto[4], costo_total, -cantidad_baja])
                 inventario.remove(producto)
-                print("Se elimino el producto", producto[2], "del inventario (stock en 0).")
+                print("Se eliminó el producto", producto[2], "del inventario (stock en 0).")
             elif cantidad_baja < producto[5]:
                 producto[5] = producto[5] - cantidad_baja
                 historial.append([codigo, producto[1], producto[2], hoy, producto[4], costo_total, -cantidad_baja])
                 print("Se dieron de baja", cantidad_baja, "unidad(es) de", producto[2], ". Quedan", producto[5], ".")
             else:
-                print("No es posible eliminar más unidades de las que se encuentran disponibles en el inventario ")
-
-    if not encontrado:
-        print("No se encontro ningun producto con el codigo", codigo)         
+                print("No es posible eliminar más unidades de las que se encuentran disponibles en el inventario.")
+    if encontrado == False:
+        print("No se encontró ningún producto con el código", codigo)       
 
 def Modificar_producto(inventario, codigo, opcion, nuevo_valor):
-    """Modifica o actualiza una categoria en especifico de un producto"""
+    """Modifica o actualiza una categoría en específico de un producto"""
     encontrado = False
+
     for producto in inventario:
         if str(producto[0]) == str(codigo):
             encontrado = True
-            if opcion == 1:   # sub-categoria
+            if opcion == 1:   # sub-categoría
                 producto[1] = validar_no_es_vacio(nuevo_valor)
             elif opcion == 2:   # precio
                 producto[4] = validar_numero(nuevo_valor)
             elif opcion == 3:   # cantidad
                 producto[5] = validar_numero(nuevo_valor)
-            print("Se a modificado el producto",producto[2], "con éxito.")
-
-    if not encontrado:
-        print("No se encontraron productos con este codigo para modificar.")
+            print("Se ha modificado el producto", producto[2], "con éxito.")
+    if encontrado == False:
+        print("No se encontraron productos con este código para modificar.")
     
-
 def buscar_producto(inventario, termino):
     """Busca un producto en el inventario por codigo o por nombre"""
     encontrados = []
@@ -273,8 +273,8 @@ def valorizar_inventario(inventario):
 
 
 def estadisticas_productos_disponibles(inventario):
-    """Calcula y muestra las categorias con mayor cantidad de productos disponibles"""
-    if inventario == [ ]:
+    """Calcula y muestra las categorías con mayor cantidad de productos disponibles"""
+    if inventario == []:
         print("No hay productos registrados en el inventario.")
     else:
         categorias_lista = []
@@ -286,15 +286,18 @@ def estadisticas_productos_disponibles(inventario):
                 if item[0] == categoria:
                     item[1] += cantidad
                     encontrado = True
-            if not encontrado:
+            if encontrado == False:
                 categorias_lista.append([categoria, cantidad])
+
         for i in range(len(categorias_lista)):
             for j in range(len(categorias_lista) - 1 - i):
-                if categorias_lista[j][1] < categorias_lista[j + 1][1]:
-                    categorias_lista[j], categorias_lista[j + 1] = categorias_lista[j + 1], categorias_lista[j]
-        print("Estadisticas de categorias con mayor cantidad de productos disponibles:")
+                if categorias_lista[j][1]<categorias_lista[j+1][1]:
+                    aux=categorias_lista[j]
+                    categorias_lista[j]=categorias_lista[j+1]
+                    categorias_lista[j+1]=aux
+        print("Estadísticas de categorías con mayor cantidad de productos disponibles:")
         for i, categoria in enumerate(categorias_lista):
-            print(i + 1, ". Categoria:", categoria[0])
+            print(i + 1, ". Categoría:", categoria[0])
             print("   Unidades totales:", categoria[1])
 
 def imprimir_menu():
