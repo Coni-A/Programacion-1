@@ -38,8 +38,9 @@ def validar_producto_existente(codigo, nombre):
             codigo = input("El codigo no coincide con el nombre del producto ingresado. Ingrese el codigo nuevamente: ")
             nombre = input("Ingrese el nombre nuevamente: ")
     return codigo, nombre
-    
-def validar_fecha(fecha):
+
+   
+def validar_fecha_actual(fecha):
     """Valida que la fecha ingresada esté en el formato AAAA/MM/DD y no sea una fecha pasada"""
     fecha = validar_no_es_vacio(fecha)
     valido = False
@@ -267,17 +268,25 @@ def imprimir_por_categoria(inventario, categoria):
         total_categoria = total_categoria + producto[5]
     print("Total de unidades en", categoria, ":", total_categoria)
 
-def imprimir_historial(historial):
+def imprimir_historial(historial, fecha):
     """Muestra por terminal todos los productos, con sus categorias, que se encuentren en el inventario"""
-    print("""
-=====================
-    HISTORIAL:
-=====================""")
+    encontrados = []
     for i, movimiento in enumerate(historial):
+        if movimiento[3] == fecha:
+            encontrados.append(movimiento)
+
+    if encontrados == [ ]:
+        print("No hay movimientos resgistrados en el historial en esa fecha")
+
+    print("""
+======================================================
+    Historial de movimientos del dia """, fecha,"""
+======================================================""")
+    print('\n')
+    
+    for movimiento in encontrados:
         print('\n')
         print(i+1,". Codigo de identificacion: ", movimiento[0],'\n' " Categoria: ", movimiento[1], '\n' " Nombre : ", movimiento[2],'\n' " Fecha de movimiento: ", movimiento[3],'\n' " Costo unitario: $", movimiento[4],'\n' " Costo total: $", movimiento[5],'\n' " Cantidad: ", movimiento[6])
-    if historial == [ ]:
-        print("No hay movimientos resgistrados en el historial.")
 
 def valorizar_inventario(inventario):
     "La funcion se encarga de computar el precio de cada producto por la cantidad disponible del mismo y asi devolver el valor total de los activos del inventario"
@@ -356,7 +365,7 @@ while opcion != 11:
         codigo_producto = validar_codigo(input("Ingrese el codigo del producto: "))
         categoria = input("Ingrese la categoria del producto: ")
         nombre_producto = input("Ingrese el nombre del producto: ")
-        fecha_ven = validar_fecha(input("Ingrese la fecha de vencimiento del producto (AAAA/MM/DD): "))
+        fecha_ven = validar_fecha_actual(input("Ingrese la fecha de vencimiento del producto (AAAA/MM/DD): "))
         costo = validar_numero(input("Ingrese el costo del producto: "))
         cantidad_disponible = validar_numero(input("Ingrese la cantidad de articulos disponibles: "))
         agregar_producto(inventario, codigo_producto, categoria, nombre_producto, fecha_ven, costo, cantidad_disponible, historial, hoy)
@@ -383,7 +392,8 @@ while opcion != 11:
         categoria = input("Ingrese la categoria a consultar (ej: lacteos, higiene): ")
         imprimir_por_categoria(inventario, categoria)
     elif opcion == 8:
-        imprimir_historial(historial)
+        fecha = input("Ingrese la fecha de los movimientos a consultar")
+        imprimir_historial(historial, fecha)
     elif opcion == 9:
         valorizar_inventario(inventario)
     elif opcion == 10:
