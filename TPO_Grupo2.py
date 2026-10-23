@@ -1,9 +1,10 @@
 import re
-from datetime import datetime   # solo se usa para averiguar la fecha actual
+import os 
+import json
+from datetime import datetime
 
 # ======================================================================
 # Sistema de gestion de inventarios - TPO Grupo 2
-#
 # Estructuras de datos usadas:
 #   - DICCIONARIO: el inventario. La clave es una TUPLA (codigo, vencimiento),
 #     asi un mismo producto puede tener varios lotes con distinta fecha de
@@ -14,11 +15,43 @@ from datetime import datetime   # solo se usa para averiguar la fecha actual
 #   - CONJUNTO: las categorias con productos y los codigos distintos.
 # ======================================================================
 
-# Categorias definidas: el usuario elige por numero, no las escribe
 CATEGORIAS = ("lacteos", "limpieza", "conservas", "almacen", "bebidas", "higiene")
+# ----------------------------------------------------------------------
+# Funciones de archivos 
+# ----------------------------------------------------------------------
+
+def guardar_nuevo_producto(producto):
+    """Agrega un lote al archivo de inventario."""
+    try:
+        arch = open("inventario.jsonl", "a", encoding="utf-8")
+
+        try:
+            json.dump(producto, arch)
+            arch.write("\n")
+        finally:
+            arch.close()
+    
+
+    except OSError as mensaje:
+        print("Error al guardar el producto:", mensaje)
+
+
+def guardar_movimiento_en_historial(movimiento):
+    """Agrega un movimiento al historial."""
+    try:
+        arch = open("historial.jsonl", "a", encoding="utf-8")
+
+        try:
+            json.dump(movimiento, arch)
+            arch.write("\n")
+        finally:
+            arch.close()
+
+    except OSError as mensaje:
+        print("Error al guardar el movimiento:", mensaje)
 
 # ----------------------------------------------------------------------
-# Funciones de impresion (formato de tablas)
+# Funciones de impresion 
 # ----------------------------------------------------------------------
 ANCHO = 90
 
@@ -59,7 +92,7 @@ def imprimir_productos(productos):
 # Funciones de fechas (sin usar datetime para parsear ni comparar)
 # ----------------------------------------------------------------------
 def fecha_hoy():
-    """Devuelve la fecha actual como texto AAAA/MM/DD (se consulta en cada operacion)"""
+    """Devuelve la fecha actual como texto AAAA/MM/DD"""
     return str(datetime.now())[:10].replace("-", "/")
 
 def dias_en_mes(mes, anio):
@@ -78,7 +111,7 @@ def fecha_a_tupla(fecha):
     return (int(anio), int(mes), int(dia))
 
 def fecha_valida(fecha):
-    """Devuelve True si el texto tiene formato AAAA/MM/DD (regex) y la fecha existe en el calendario"""
+    """Devuelve True si el texto tiene formato AAAA/MM/DD y la fecha existe en el calendario"""
     if re.search("^[0-9][0-9][0-9][0-9]/[0-9][0-9]/[0-9][0-9]$", fecha) == None:
         return False
     anio, mes, dia = fecha_a_tupla(fecha)
@@ -120,7 +153,7 @@ def validar_codigo(codigo):
         codigo = input("Ingrese un codigo de nueve (9) digitos numericos: ").strip()
     return codigo
 
-def validar_nombre(nombre):
+def validar_nombre(nombre):  
     """Valida que el nombre tenga al menos una letra o un numero (usa expresion regular)"""
     nombre = validar_no_es_vacio(nombre)
     while re.search("[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ]", nombre) == None:
@@ -160,35 +193,6 @@ def elegir_categoria(permitir_todas=False):
 # ----------------------------------------------------------------------
 # Datos iniciales
 # ----------------------------------------------------------------------
-def crear_inventario():
-    """Crea y devuelve el inventario inicial (diccionario: (codigo, vence) -> datos del lote)"""
-    return {
-        ("123456789", "2027/12/30"): {"categoria": "lacteos",   "nombre": "Leche entera La Serenisima por 1l",   "costo": 3000, "cantidad": 200},
-        ("123456789", "2026/11/15"): {"categoria": "lacteos",   "nombre": "Leche entera La Serenisima por 1l",   "costo": 3000, "cantidad": 60},
-        ("987654321", "2026/09/20"): {"categoria": "lacteos",   "nombre": "Queso muzzarela La Blanca por 500gm", "costo": 7000, "cantidad": 120},
-        ("579246813", "2028/12/05"): {"categoria": "limpieza",  "nombre": "Desinfectante Lysoform por 360ml",    "costo": 4200, "cantidad": 70},
-        ("813579246", "2028/11/20"): {"categoria": "conservas", "nombre": "Pure de tomate Arcor por 520gm",      "costo": 1900, "cantidad": 150},
-        ("369258147", "2026/10/08"): {"categoria": "lacteos",   "nombre": "Crema de leche Tregar por 200ml",     "costo": 2200, "cantidad": 90},
-        ("246813579", "2029/01/20"): {"categoria": "limpieza",  "nombre": "Detergente Magistral por 750ml",      "costo": 2800, "cantidad": 100},
-        ("753159456", "2028/03/25"): {"categoria": "almacen",   "nombre": "Azucar Ledesma por 1kg",              "costo": 1700, "cantidad": 210},
-        ("135792468", "2028/09/15"): {"categoria": "limpieza",  "nombre": "Lavandina Ayudin por 1l",             "costo": 1800, "cantidad": 130}
-    }
-
-def crear_historial():
-    """Crea y devuelve el historial de movimientos (matriz: una fila por movimiento).
-    Orden de cada fila:
-    [codigo, categoria, nombre, fecha, tipo, cantidad, costo unitario, costo total, detalle]
-    tipo: ALTA, BAJA o MODIF. La cantidad es positiva en las altas y negativa en las bajas."""
-    return [["123456789", "lacteos",   "Leche entera La Serenisima por 1l",   "2026/07/30", "ALTA", 200, 3000, 600000, ""],
-            ["123456789", "lacteos",   "Leche entera La Serenisima por 1l",   "2026/08/10", "ALTA", 60, 3000, 180000, ""],
-            ["987654321", "lacteos",   "Queso muzzarela La Blanca por 500gm", "2026/03/20", "BAJA", -20, 7000, 140000, ""],
-            ["579246813", "limpieza",  "Desinfectante Lysoform por 360ml",    "2026/08/12", "ALTA", 50, 4200, 210000, ""],
-            ["813579246", "conservas", "Pure de tomate Arcor por 520gm",      "2026/08/05", "BAJA", -20, 1900, 38000, ""],
-            ["369258147", "lacteos",   "Crema de leche Tregar por 200ml",     "2026/07/18", "ALTA", 50, 2200, 110000, ""],
-            ["246813579", "limpieza",  "Detergente Magistral por 750ml",      "2026/08/20", "BAJA", -20, 2800, 56000, ""],
-            ["753159456", "almacen",   "Azucar Ledesma por 1kg",              "2026/06/25", "ALTA", 100, 1700, 170000, ""],
-            ["135792468", "limpieza",  "Lavandina Ayudin por 1l",             "2026/08/15", "ALTA", 50, 1800, 90000, ""]]
-
 def obtener_categorias(inventario):
     """Devuelve un conjunto con las categorias que tienen productos (sin repetidos)"""
     categorias = set()
@@ -239,37 +243,58 @@ def elegir_lote(inventario, codigo):
         vence = input("Ese lote no existe. Ingrese un vencimiento de la lista: ").strip()
     return (codigo, vence)
 
-def registrar_movimiento(historial, clave, producto, tipo, cantidad, detalle=""):
-    """Agrega una fila al historial con la fecha de hoy. Se usa en altas, bajas y modificaciones"""
-    historial.append([clave[0], producto["categoria"], producto["nombre"], fecha_hoy(), tipo,
-                      cantidad, producto["costo"], producto["costo"] * abs(cantidad), detalle])
-
+def registrar_movimiento(producto, tipo, cantidad, detalle=""):
+    movimiento = {
+        "codigo": producto["codigo"],
+        "categoria": producto["categoria"],
+        "nombre": producto["nombre"],
+        "fecha": datetime.now().strftime("%Y/%m/%d"),
+        "tipo": tipo,
+        "cantidad": cantidad,
+        "costo": producto["costo"],
+        "total": producto["costo"] * abs(cantidad),
+        "detalle": detalle
+    }
+    guardar_movimiento_en_historial(movimiento)
 # ----------------------------------------------------------------------
 # Funciones principales
 # ----------------------------------------------------------------------
-def imprimir_inventario(inventario):
-    """Muestra el inventario agrupado por categoria, con el total de unidades de cada una"""
-    imprimir_titulo("Inventario por categoria")
-    if inventario == {}:
-        print("No hay productos registrados en el inventario.")
-        return
-    presentes = obtener_categorias(inventario)
-    for categoria in CATEGORIAS:
-        if categoria in presentes:
-            lotes = lotes_de_categoria(inventario, categoria)
-            unidades = 0
-            for datos in lotes.values():
-                unidades = unidades + datos["cantidad"]
-            print()
-            print(f">>> {categoria.upper()} ({unidades} unidades)")
-            imprimir_productos(lotes)
+def imprimir_inventario():
+    print("\nINVENTARIO")
+    print("-" * 80)
 
-def agregar_producto(inventario, historial, codigo, categoria, nombre, vence, costo, cantidad):
-    """Agrega un lote nuevo al inventario y registra el alta en el historial"""
-    clave = (codigo, vence)
-    inventario[clave] = {"categoria": categoria, "nombre": nombre, "costo": costo, "cantidad": cantidad}
-    registrar_movimiento(historial, clave, inventario[clave], "ALTA", cantidad)
-    print(f"\n>> Se agrego el producto '{nombre}' (vence {vence}) con exito.")
+    try:
+        arch = open("inventario.jsonl", "r", encoding="utf-8")
+        try:
+            linea = arch.readline()
+            while linea != "":
+                producto = json.loads(linea)
+                print(
+                    producto["codigo"],
+                    producto["categoria"],
+                    producto["nombre"],
+                    producto["vence"],
+                    producto["costo"],
+                    producto["cantidad"]
+                )
+                linea = arch.readline()
+        finally:
+            arch.close()
+    except OSError as mensaje:
+        print("Error al leer el inventario:", mensaje)
+
+def agregar_producto(codigo, categoria, nombre, vence, costo, cantidad):
+    producto = {
+        "codigo": codigo,
+        "categoria": categoria,
+        "nombre": nombre,
+        "vence": vence,
+        "costo": costo,
+        "cantidad": cantidad
+    }
+    guardar_nuevo_producto(producto)
+    registrar_movimiento(producto, "ALTA", cantidad)
+    print("Producto agregado correctamente.")
 
 def reponer_stock(inventario, historial, clave, cantidad):
     """Suma unidades a un lote que ya existe y registra el alta en el historial"""
@@ -366,36 +391,40 @@ def imprimir_por_categoria(inventario, categoria):
     imprimir_productos(encontrados)
     print(f"Total de unidades en {categoria}: {total_categoria}")
 
-def imprimir_historial(historial, categoria, fecha):
-    """Muestra los movimientos del historial (altas, bajas y modificaciones).
-    Se puede filtrar por categoria y/o por fecha (vacio = todos)"""
-    encontrados = []
-    for movimiento in historial:
-        if (categoria == "" or movimiento[1] == categoria) and (fecha == "" or movimiento[3] == fecha):
-            encontrados.append(movimiento)
+def imprimir_historial(categoria="", fecha=""):
+    encontrados = 0
 
-    imprimir_titulo("Historial de movimientos")
-    if categoria != "":
-        print(f"Categoria: {categoria}")
-    if fecha != "":
-        print(f"Fecha: {fecha}")
-    if encontrados == []:
-        print("No hay movimientos registrados con esos criterios.")
+    try:
+        arch = open("historial.jsonl", "r", encoding="utf-8")
+        try:
+            linea = arch.readline()
+            while linea != "":
+                movimiento = json.loads(linea)
+                coincide_categoria = (categoria == "" or movimiento["categoria"] == categoria)
+                coincide_fecha = (fecha == "" or movimiento["fecha"] == fecha)
+
+                if coincide_categoria and coincide_fecha:
+                    print(
+                        movimiento["fecha"],
+                        movimiento["tipo"],
+                        movimiento["codigo"],
+                        movimiento["nombre"],
+                        movimiento["cantidad"],
+                        movimiento["total"],
+                        movimiento["detalle"]
+                    )
+                    encontrados += 1
+
+                linea = arch.readline()
+
+        finally:
+            arch.close()
+    except OSError as mensaje:
+        print("Error al leer el historial:", mensaje)
         return
-
-    print("FECHA".ljust(11) + "TIPO".ljust(7) + "CODIGO".ljust(11) + "CATEGORIA".ljust(12) + "NOMBRE".ljust(25)
-          + "CANT.".rjust(6) + "UNITARIO".rjust(9) + "TOTAL".rjust(9))
-    print(linea("-"))
-    for mov in encontrados:
-        cantidad = str(mov[5])
-        if mov[5] > 0:
-            cantidad = "+" + cantidad
-        print(mov[3].ljust(11) + mov[4].ljust(7) + mov[0].ljust(11) + recortar(mov[1].capitalize(), 11).ljust(12)
-              + recortar(mov[2], 23).ljust(25) + cantidad.rjust(6) + f"${mov[6]}".rjust(9) + f"${mov[7]}".rjust(9))
-        if mov[8] != "":
-            print("    -> " + mov[8])
-    print(linea("-"))
-    print(f"Total de movimientos: {len(encontrados)}")
+    if encontrados == 0:
+        print("No hay movimientos con esos criterios.")
+    print("Total de movimientos encontrados:", encontrados)
 
 def valorizar_inventario(inventario):
     """Calcula el valor total del inventario (costo por cantidad de cada lote)"""
@@ -449,8 +478,6 @@ def imprimir_menu():
 # ----------------------------------------------------------------------
 # Programa principal
 # ----------------------------------------------------------------------
-inventario = crear_inventario()
-historial = crear_historial()
 
 imprimir_titulo("Sistema de gestion de inventario")
 imprimir_menu()
