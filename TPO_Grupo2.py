@@ -19,9 +19,7 @@ from datetime import datetime
 #- reponer_stock
 #- dar_de_baja
 #- modificar_producto
-#- buscar_producto
 #- productos_proximos_a_vencer
-#- imprimir_por_categoria
 #- valorizar_inventario
 # ======================================================================
 
@@ -226,7 +224,7 @@ def lotes_de_codigo(codigo):
             linea = arch.readline()
             while linea != "":
                 lotes = {}
-                if linea[0] == codigo:
+                if linea['codigo'] == codigo:
                     lotes[clave] = linea[clave]
                 linea = arch.readline()
             return lotes
@@ -236,13 +234,22 @@ def lotes_de_codigo(codigo):
         print("Error al guardar el movimiento:", mensaje)
 
 
-def lotes_de_categoria(inventario, categoria):
+def lotes_de_categoria(categoria):
     """Devuelve un diccionario con los lotes de una categoria"""
-    lotes = {}
-    for clave in inventario:
-        if inventario[clave]["categoria"] == categoria:
-            lotes[clave] = inventario[clave]
-    return lotes
+    try:
+        arch = open("historial.jsonl", "r", encoding="utf-8")
+        try:
+            linea = arch.readline()
+            while linea != "":
+                lotes = {}
+                if linea['categoria'] == categoria:
+                    lotes[categoria] = linea[categoria]
+                linea = arch.readline()
+            return lotes
+        finally:
+            arch.close()
+    except OSError as mensaje:
+        print("Error al guardar el movimiento:", mensaje)
 
 def elegir_lote(codigo):
     """Devuelve la clave (codigo, vence) del lote a usar. Si el codigo tiene un solo lote lo toma directo;
@@ -355,20 +362,33 @@ def modificar_producto(inventario, historial, clave, opcion, nuevo_valor):
         registrar_movimiento(historial, clave, producto, "MODIF", diferencia, detalle)
     print(f"\n>> Se modifico el producto '{producto['nombre']}' con exito.")
 
-def buscar_producto(inventario, termino):
+def buscar_producto(termino):
     """Busca lotes por codigo, nombre, categoria o vencimiento (coincidencia parcial)"""
     termino = termino.strip().lower()
-    encontrados = {}
-    for clave in inventario:
-        datos = inventario[clave]
-        if termino in clave[0] or termino in clave[1] or termino in datos["nombre"].lower() or termino in datos["categoria"]:
-            encontrados[clave] = datos
-
-    imprimir_titulo("Resultado de la busqueda")
-    if encontrados == {}:
-        print("No se encontraron productos con ese criterio.")
-    else:
-        imprimir_productos(encontrados)
+    encontrados = 0
+    try:
+        arch = open("inventario.jsonl", "r", encoding="utf-8")
+        try:
+            linea = arch.readline()
+            while linea != "":
+                producto = json.loads(linea)
+                if termino in linea:
+                    print(
+                        producto["codigo"],
+                        producto["categoria"],
+                        producto["nombre"],
+                        producto["vence"],
+                        producto["costo"],
+                        producto["cantidad"]
+                    )
+                    encontrados += 1
+                linea = arch.readline()
+                if encontrados == 0:
+                    print("No se encontraron productos con ese criterio.")
+        finally:
+            arch.close()
+    except OSError as mensaje:
+            print("Error al guardar el movimiento:", mensaje)
 
 def productos_proximos_a_vencer(inventario, dias):
     """Imprime los lotes ya vencidos y los que vencen dentro de los proximos 'dias' dias"""
@@ -396,22 +416,31 @@ def productos_proximos_a_vencer(inventario, dias):
     else:
         imprimir_productos(proximos)
 
-def imprimir_por_categoria(inventario, categoria):
+def imprimir_por_categoria(categoria):
     """Imprime los lotes de una categoria y el total de unidades disponibles"""
-    encontrados = lotes_de_categoria(inventario, categoria)
-    imprimir_titulo(f"Stock de la categoria {categoria}")
-    if encontrados == {}:
-        print(f"No hay productos registrados en la categoria {categoria}.")
-        return
-    total_categoria = 0
-    for datos in encontrados.values():
-        total_categoria = total_categoria + datos["cantidad"]
-    imprimir_productos(encontrados)
-    print(f"Total de unidades en {categoria}: {total_categoria}")
+    try:
+        arch = open("inventario.jsonl", "r", encoding="utf-8")
+        try:
+            linea = arch.readline()
+            while linea != "":
+                if linea['categoria'] == categoria:
+                    producto = json.loads(linea)
+                    print(
+                        producto["codigo"],
+                        producto["categoria"],
+                        producto["nombre"],
+                        producto["vence"],
+                        producto["costo"],
+                        producto["cantidad"]
+                    )
+                linea = arch.readline()
+        finally:
+            arch.close()
+    except OSError as mensaje:
+        print("Error al guardar el movimiento:", mensaje)
 
 def imprimir_historial(categoria="", fecha=""):
     encontrados = 0
-
     try:
         arch = open("historial.jsonl", "r", encoding="utf-8")
         try:
@@ -551,7 +580,7 @@ while opcion != 11:
 
     elif opcion == 5:
         termino = validar_no_es_vacio(input("Ingrese el codigo, nombre, categoria o vencimiento a buscar: "))
-        buscar_producto(inventario, termino)
+        buscar_producto(termino)
 
     elif opcion == 6:
         dias = validar_numero(input("Ingrese la cantidad de dias a futuro para revisar vencimientos: "))
@@ -560,7 +589,7 @@ while opcion != 11:
     elif opcion == 7:
         print("\nCategorias disponibles:")
         categoria = elegir_categoria()
-        imprimir_por_categoria(inventario, categoria)
+        imprimir_por_categoria(categoria)
 
     elif opcion == 8:
         print("\nFiltrar por categoria:")
