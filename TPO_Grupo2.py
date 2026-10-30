@@ -13,6 +13,16 @@ from datetime import datetime
 #   - TUPLAS: las claves del inventario, las fechas (anio, mes, dia), que se
 #     comparan directamente, las categorias definidas y las opciones del menu.
 #   - CONJUNTO: las categorias con productos y los codigos distintos.
+
+
+# Funciones a modificar:
+#- reponer_stock
+#- dar_de_baja
+#- modificar_producto
+#- buscar_producto
+#- productos_proximos_a_vencer
+#- imprimir_por_categoria
+#- valorizar_inventario
 # ======================================================================
 
 CATEGORIAS = ("lacteos", "limpieza", "conservas", "almacen", "bebidas", "higiene")
@@ -30,8 +40,6 @@ def guardar_nuevo_producto(producto):
             arch.write("\n")
         finally:
             arch.close()
-    
-
     except OSError as mensaje:
         print("Error al guardar el producto:", mensaje)
 
@@ -210,13 +218,23 @@ def obtener_codigos(inventario):
 # ----------------------------------------------------------------------
 # Funciones auxiliares sobre el inventario y el historial
 # ----------------------------------------------------------------------
-def lotes_de_codigo(inventario, codigo):
+def lotes_de_codigo(codigo):
     """Devuelve un diccionario con todos los lotes (distintos vencimientos) de un codigo"""
-    lotes = {}
-    for clave in inventario:
-        if clave[0] == codigo:
-            lotes[clave] = inventario[clave]
-    return lotes
+    try:
+        arch = open("historial.jsonl", "r", encoding="utf-8")
+        try:
+            linea = arch.readline()
+            while linea != "":
+                lotes = {}
+                if linea[0] == codigo:
+                    lotes[clave] = linea[clave]
+                linea = arch.readline()
+            return lotes
+        finally:
+            arch.close()
+    except OSError as mensaje:
+        print("Error al guardar el movimiento:", mensaje)
+
 
 def lotes_de_categoria(inventario, categoria):
     """Devuelve un diccionario con los lotes de una categoria"""
@@ -226,10 +244,10 @@ def lotes_de_categoria(inventario, categoria):
             lotes[clave] = inventario[clave]
     return lotes
 
-def elegir_lote(inventario, codigo):
+def elegir_lote(codigo):
     """Devuelve la clave (codigo, vence) del lote a usar. Si el codigo tiene un solo lote lo toma directo;
     si tiene varios, los muestra y pide el vencimiento. Devuelve None si el codigo no existe."""
-    lotes = lotes_de_codigo(inventario, codigo)
+    lotes = lotes_de_codigo(codigo)
     if lotes == {}:
         print(f"\n>> No se encontro ningun producto con el codigo {codigo}.")
         return None
@@ -322,7 +340,7 @@ def modificar_producto(inventario, historial, clave, opcion, nuevo_valor):
     El nuevo valor llega ya validado. La categoria se cambia en todos los lotes del mismo codigo."""
     producto = inventario[clave]
     if opcion == 1:
-        for clave_lote, lote in lotes_de_codigo(inventario, clave[0]).items():
+        for clave_lote, lote in lotes_de_codigo(clave[0]).items():
             detalle = f"Categoria: {lote['categoria']} -> {nuevo_valor}"
             lote["categoria"] = nuevo_valor
             registrar_movimiento(historial, clave_lote, lote, "MODIF", 0, detalle)
@@ -484,11 +502,11 @@ imprimir_menu()
 opcion = validar_numero(input("Elija una opción: "))
 while opcion != 11:
     if opcion == 1:
-        imprimir_inventario(inventario)
+        imprimir_inventario()
 
     elif opcion == 2:
         codigo = validar_codigo(input("Ingrese el codigo del producto (9 digitos): "))
-        lotes = lotes_de_codigo(inventario, codigo)
+        lotes = lotes_de_codigo(codigo)
         if lotes != {}:
             for lote in lotes.values():
                 base = lote
@@ -499,7 +517,7 @@ while opcion != 11:
             print("\nCategorias disponibles:")
             categoria = elegir_categoria()
             nombre = validar_nombre(input("Ingrese el nombre del producto: "))
-        vence = validar_fecha_actual(input("Ingrese la fecha de vencimiento del producto (AAAA/MM/DD): "))
+            vence = validar_fecha_actual(input("Ingrese la fecha de vencimiento del producto (AAAA/MM/DD): "))
         if (codigo, vence) in inventario:
             print("\n>> Ya existe un lote con ese vencimiento. Se sumaran unidades a su stock.")
             cantidad = validar_numero(input("Ingrese la cantidad de unidades que ingresan: "))
@@ -507,18 +525,18 @@ while opcion != 11:
         else:
             costo = validar_numero(input("Ingrese el costo del producto: "))
             cantidad = validar_numero(input("Ingrese la cantidad de articulos disponibles: "))
-            agregar_producto(inventario, historial, codigo, categoria, nombre, vence, costo, cantidad)
+            agregar_producto( codigo, categoria, nombre, vence, costo, cantidad)
 
     elif opcion == 3:
         codigo = validar_codigo(input("Ingrese el codigo del producto a dar de baja: "))
-        clave = elegir_lote(inventario, codigo)
+        clave = elegir_lote(codigo)
         if clave != None:
             cantidad = validar_numero(input("Ingrese la cantidad de unidades que quiera dar de baja: "))
             dar_de_baja(historial, inventario, clave, cantidad)
 
     elif opcion == 4:
         codigo = validar_codigo(input("Ingrese el codigo del producto a modificar: "))
-        clave = elegir_lote(inventario, codigo)
+        clave = elegir_lote(codigo)
         if clave != None:
             print("1. Categoria \n2. Costo \n3. Cantidad \n4. Salir")
             opcion_mod = validar_numero(input("¿Qué desea modificar?: "))
@@ -551,7 +569,7 @@ while opcion != 11:
         if fecha != "" and not fecha_valida(fecha):
             print("\n>> La fecha no es valida (formato AAAA/MM/DD).")
         else:
-            imprimir_historial(historial, categoria, fecha)
+            imprimir_historial(categoria, fecha)
 
     elif opcion == 9:
         valorizar_inventario(inventario)
