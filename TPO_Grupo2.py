@@ -543,17 +543,36 @@ def imprimir_historial(categoria="", fecha=""):
         print("No hay movimientos con esos criterios.")
     print("Total de movimientos encontrados:", encontrados)
 
-def valorizar_inventario(inventario):
-    """Calcula el valor total del inventario (costo por cantidad de cada lote)"""
+def valorizar_inventario():
+    """Calcula el valor total del inventario (costo por cantidad de cada lote) leyendo linea por linea"""
     imprimir_titulo("Valorizacion del inventario")
-    if inventario == {}:
+    lotes = 0
+    unidades = 0
+    total = 0
+    try:
+        arch = open("inventario.jsonl", "rt", encoding="utf-8")
+        linea = arch.readline()
+        while linea != "":
+            producto = json.loads(linea)
+            lotes += 1
+            unidades += producto["cantidad"]
+            total += producto["costo"] * producto["cantidad"]
+            linea = arch.readline()
+    except FileNotFoundError:
+        pass
+    except OSError as mensaje:
+        print("Error al leer el inventario:", mensaje)
+        return
+    finally:
+        try:
+            arch.close()
+        except NameError:
+            pass
+    if lotes == 0:
         print("No hay productos registrados en el inventario.")
         return
-    total = 0
-    for datos in inventario.values():
-        total = total + datos["costo"] * datos["cantidad"]
-    print("Productos distintos:".ljust(30) + str(len(obtener_codigos(inventario))).rjust(15))
-    print("Lotes en el inventario:".ljust(30) + str(len(inventario)).rjust(15))
+    print("Lotes en el inventario:".ljust(30) + str(lotes).rjust(15))
+    print("Unidades en total:".ljust(30) + str(unidades).rjust(15))
     print("Valor total del inventario:".ljust(30) + f"${total}".rjust(15))
 
 def estadisticas_productos_disponibles(inventario):
@@ -671,7 +690,7 @@ while opcion != 11:
             imprimir_historial(categoria, fecha)
 
     elif opcion == 9:
-        valorizar_inventario(inventario)
+        valorizar_inventario()
 
     elif opcion == 10:
         estadisticas_productos_disponibles(inventario)
