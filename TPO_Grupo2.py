@@ -384,12 +384,13 @@ def agregar_producto(codigo, categoria, nombre, vence, costo, cantidad):
     registrar_movimiento(producto, "ALTA", cantidad)
     print("Producto agregado correctamente.")
 
-def reponer_stock(inventario, historial, clave, cantidad):
-    """Suma unidades a un lote que ya existe y registra el alta en el historial"""
-    producto = inventario[clave]
-    producto["cantidad"] = producto["cantidad"] + cantidad
-    registrar_movimiento(historial, clave, producto, "ALTA", cantidad)
-    print(f"\n>> Se sumaron {cantidad} unidad(es) a '{producto['nombre']}'. Ahora hay {producto['cantidad']}.")
+def reponer_stock(clave, cantidad):
+    """Suma unidades a un lote que ya existe"""
+    producto = buscar_lote(clave[0], clave[1])
+    nuevo_stock=producto["cantidad"] + cantidad
+    if reescribir_inventario(clave[0], clave[1], "cantidad", nuevo_stock):
+        registrar_movimiento(producto,"ALTA", cantidad)
+        print (f"\n>> Se sumaron {cantidad} unidad(es) a " f"'{producto['nombre']}'. "f"Ahora hay {nuevo_stock}.")
 
 def dar_de_baja(clave, cantidad_baja):
     """Da de baja una cantidad de un lote. Si baja todo el stock, el lote se elimina del inventario"""
@@ -616,7 +617,7 @@ while opcion != 11:
         if (codigo, vence) in lotes:
             print("\n>> Ya existe un lote con ese vencimiento. Se sumaran unidades a su stock.")
             cantidad = validar_numero(input("Ingrese la cantidad de unidades que ingresan: "))
-            reponer_stock(inventario, historial, (codigo, vence), cantidad)
+            reponer_stock((codigo, vence), cantidad)
         else:
             costo = validar_numero(input("Ingrese el costo del producto: "))
             cantidad = validar_numero(input("Ingrese la cantidad de articulos disponibles: "))
