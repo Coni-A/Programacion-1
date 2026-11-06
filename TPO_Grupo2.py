@@ -460,27 +460,41 @@ def buscar_producto(termino):
     except OSError as mensaje:
             print("Error al guardar el movimiento:", mensaje)
 
-def productos_proximos_a_vencer(inventario, dias):
+def productos_proximos_a_vencer( dias):
     """Imprime los lotes ya vencidos y los que vencen dentro de los proximos 'dias' dias"""
     hoy = fecha_hoy()
     hoy_tupla = fecha_a_tupla(hoy)
     limite = fecha_proxima_a_vencer(hoy, dias)
     vencidos = {}
     proximos = {}
-    for clave in inventario:
-        vence = fecha_a_tupla(clave[1])
-        if vence < hoy_tupla:
-            vencidos[clave] = inventario[clave]
-        elif vence <= limite:
-            proximos[clave] = inventario[clave]
-
+    try:
+        arch= open ("inventario.jsonl", "rt", encoding="utf-8")
+        linea= arch.readline()
+        while linea!= "":
+            producto= json.loads(linea)
+            clave = (producto["codigo"], producto["vence"])
+            vence= fecha_a_tupla(producto["vence"])
+            datos= {"categoria": producto["categoria"],"nombre": producto["nombre"],"costo": producto["costo"],"cantidad": producto["cantidad"]}
+            if vence< hoy_tupla:
+                vencidos[clave] = datos
+            elif vence <= limite:
+                proximos[clave] = datos
+            linea = arch.readline()
+    except OSError as mensaje:
+        print("Error al leer el inventario:", mensaje)
+        return
+    finally:
+        try:
+            arch.close()
+        except:
+            pass
     imprimir_titulo("Productos ya vencidos")
     if vencidos == {}:
         print("No hay productos vencidos.")
     else:
         imprimir_productos(vencidos)
-
-    imprimir_titulo(f"Productos que vencen en los proximos {dias} dias")
+    imprimir_titulo(
+        f"Productos que vencen en los proximos {dias} dias")
     if proximos == {}:
         print("No hay productos proximos a vencer en ese periodo.")
     else:
@@ -673,7 +687,7 @@ while opcion != 11:
 
     elif opcion == 6:
         dias = validar_numero(input("Ingrese la cantidad de dias a futuro para revisar vencimientos: "))
-        productos_proximos_a_vencer(inventario, dias)
+        productos_proximos_a_vencer( dias)
 
     elif opcion == 7:
         print("\nCategorias disponibles:")
