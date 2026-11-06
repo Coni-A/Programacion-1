@@ -217,22 +217,85 @@ def obtener_codigos(inventario):
 # Funciones auxiliares sobre el inventario y el historial
 # ----------------------------------------------------------------------
 def lotes_de_codigo(codigo):
-    """Devuelve un diccionario con todos los lotes (distintos vencimientos) de un codigo"""
+    """Devuelve un diccionario con todos los lotes (distintos vencimientos) de un codigo.
+    La clave es la tupla (codigo, vence). Lee el inventario linea por linea"""
+    lotes = {}
     try:
-        arch = open("historial.jsonl", "r", encoding="utf-8")
-        try:
+        arch = open("inventario.jsonl", "rt", encoding="utf-8")
+        linea = arch.readline()
+        while linea != "":
+            producto = json.loads(linea)
+            if producto["codigo"] == codigo:
+                lotes[(producto["codigo"], producto["vence"])] = producto
             linea = arch.readline()
-            while linea != "":
-                lotes = {}
-                if linea['codigo'] == codigo:
-                    lotes[clave] = linea[clave]
-                linea = arch.readline()
-            return lotes
-        finally:
-            arch.close()
+    except FileNotFoundError:
+        pass
     except OSError as mensaje:
-        print("Error al guardar el movimiento:", mensaje)
+        print("Error al leer el inventario:", mensaje)
+    finally:
+        try:
+            arch.close()
+        except NameError:
+            pass
+    return lotes
 
+def buscar_lote(codigo, vence):
+    """Devuelve el diccionario del lote (codigo, vence) leyendo el inventario linea por linea.
+    Si no lo encuentra devuelve None"""
+    try:
+        arch = open("inventario.jsonl", "rt", encoding="utf-8")
+        linea = arch.readline()
+        while linea != "":
+            producto = json.loads(linea)
+            if producto["codigo"] == codigo and producto["vence"] == vence:
+                return producto
+            linea = arch.readline()
+    except OSError as mensaje:
+        print("Error al leer el inventario:", mensaje)
+    finally:
+        try:
+            arch.close()
+        except NameError:
+            pass
+    return None
+ 
+def reescribir_inventario(codigo, vence, campo, valor):
+    """Copia el inventario a un archivo auxiliar cambiando el valor de 'campo' en el lote (codigo, vence).
+    Si vence es "" el cambio se hace en todos los lotes de ese codigo.
+    Si campo es "" el lote se elimina (no se copia).
+    Al final el archivo auxiliar reemplaza al original. Devuelve True si salio bien"""
+    try:
+        original = open("inventario.jsonl", "rt", encoding="utf-8")
+        auxiliar = open("inventario_aux.jsonl", "wt", encoding="utf-8")
+        linea = original.readline()
+        while linea != "":
+            producto = json.loads(linea)
+            if producto["codigo"] == codigo and (vence == "" or producto["vence"] == vence):
+                if campo != "":
+                    producto[campo] = valor
+                    auxiliar.write(json.dumps(producto) + "\n")
+            else:
+                auxiliar.write(linea)
+            linea = original.readline()
+    except OSError as mensaje:
+        print("Error al actualizar el inventario:", mensaje)
+        return False
+    finally:
+        try:
+            original.close()
+        except NameError:
+            pass
+        try:
+            auxiliar.close()
+        except NameError:
+            pass
+    try:
+        os.remove("inventario.jsonl")
+        os.rename("inventario_aux.jsonl", "inventario.jsonl")
+    except OSError as mensaje:
+        print("Error al reemplazar el inventario:", mensaje)
+        return False
+    return True
 
 def lotes_de_categoria(categoria):
     """Devuelve un diccionario con los lotes de una categoria"""
@@ -328,19 +391,22 @@ def reponer_stock(inventario, historial, clave, cantidad):
     registrar_movimiento(historial, clave, producto, "ALTA", cantidad)
     print(f"\n>> Se sumaron {cantidad} unidad(es) a '{producto['nombre']}'. Ahora hay {producto['cantidad']}.")
 
-def dar_de_baja(historial, inventario, clave, cantidad_baja):
+def dar_de_baja(clave, cantidad_baja):
     """Da de baja una cantidad de un lote. Si baja todo el stock, el lote se elimina del inventario"""
-    producto = inventario[clave]
-    if cantidad_baja > producto["cantidad"]:
+    producto = buscar_lote(clave[0], clave[1])
+    if producto == None:
+        print("\n>> No se encontro el lote.")
+    elif cantidad_baja > producto["cantidad"]:
         print(f"\n>> No es posible dar de baja {cantidad_baja}: solo hay {producto['cantidad']} unidad(es).")
     elif cantidad_baja == producto["cantidad"]:
-        registrar_movimiento(historial, clave, producto, "BAJA", -cantidad_baja)
-        inventario.pop(clave)
-        print(f"\n>> Se elimino el lote de '{producto['nombre']}' del inventario (stock en 0).")
+        if reescribir_inventario(clave[0], clave[1], "", None):
+            registrar_movimiento(producto, "BAJA", -cantidad_baja)
+            print(f"\n>> Se elimino el lote de '{producto['nombre']}' del inventario (stock en 0).")
     else:
-        producto["cantidad"] = producto["cantidad"] - cantidad_baja
-        registrar_movimiento(historial, clave, producto, "BAJA", -cantidad_baja)
-        print(f"\n>> Se dieron de baja {cantidad_baja} unidad(es) de '{producto['nombre']}'. Quedan {producto['cantidad']}.")
+        quedan = producto["cantidad"] - cantidad_baja
+        if reescribir_inventario(clave[0], clave[1], "cantidad", quedan):
+            registrar_movimiento(producto, "BAJA", -cantidad_baja)
+            print(f"\n>> Se dieron de baja {cantidad_baja} unidad(es) de '{producto['nombre']}'. Quedan {quedan}.")
 
 def modificar_producto(inventario, historial, clave, opcion, nuevo_valor):
     """Modifica la categoria (1), el costo (2) o la cantidad (3) y registra la modificacion en el historial.
@@ -547,7 +613,7 @@ while opcion != 11:
             categoria = elegir_categoria()
             nombre = validar_nombre(input("Ingrese el nombre del producto: "))
             vence = validar_fecha_actual(input("Ingrese la fecha de vencimiento del producto (AAAA/MM/DD): "))
-        if (codigo, vence) in inventario:
+        if (codigo, vence) in lotes:
             print("\n>> Ya existe un lote con ese vencimiento. Se sumaran unidades a su stock.")
             cantidad = validar_numero(input("Ingrese la cantidad de unidades que ingresan: "))
             reponer_stock(inventario, historial, (codigo, vence), cantidad)
@@ -561,7 +627,7 @@ while opcion != 11:
         clave = elegir_lote(codigo)
         if clave != None:
             cantidad = validar_numero(input("Ingrese la cantidad de unidades que quiera dar de baja: "))
-            dar_de_baja(historial, inventario, clave, cantidad)
+            dar_de_baja(clave, cantidad)
 
     elif opcion == 4:
         codigo = validar_codigo(input("Ingrese el codigo del producto a modificar: "))
