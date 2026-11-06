@@ -489,8 +489,8 @@ def imprimir_por_categoria(categoria):
         try:
             linea = arch.readline()
             while linea != "":
-                if linea['categoria'] == categoria:
-                    producto = json.loads(linea)
+                producto = json.loads(linea)
+                if producto['categoria'] == categoria:
                     print(
                         producto["codigo"],
                         producto["categoria"],
