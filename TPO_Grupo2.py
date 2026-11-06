@@ -412,22 +412,25 @@ def dar_de_baja(clave, cantidad_baja):
 def modificar_producto(inventario, historial, clave, opcion, nuevo_valor):
     """Modifica la categoria (1), el costo (2) o la cantidad (3) y registra la modificacion en el historial.
     El nuevo valor llega ya validado. La categoria se cambia en todos los lotes del mismo codigo."""
-    producto = inventario[clave]
+    producto = buscar_lote(clave[0], clave[1])
     if opcion == 1:
-        for clave_lote, lote in lotes_de_codigo(clave[0]).items():
-            detalle = f"Categoria: {lote['categoria']} -> {nuevo_valor}"
-            lote["categoria"] = nuevo_valor
-            registrar_movimiento(historial, clave_lote, lote, "MODIF", 0, detalle)
+        lotes= lotes_de_codigo(clave[0])
+        if reescribir_inventario(clave[0], "", "categoria", nuevo_valor):
+            for clave_lote, lote in lotes.items():
+                detalle = f"Categoria: {lote['categoria']} -> {nuevo_valor}"
+                registrar_movimiento( lote, "MODIF", 0, detalle)
+            print(f"\n>> Se modifico el producto '{producto['nombre']}' con exito.")
     elif opcion == 2:
         detalle = f"Costo: ${producto['costo']} -> ${nuevo_valor}"
-        producto["costo"] = nuevo_valor
-        registrar_movimiento(historial, clave, producto, "MODIF", 0, detalle)
+        if reescribir_inventario(clave[0],clave[1], "costo", nuevo_valor):
+            registrar_movimiento( producto, "MODIF", 0, detalle)
+            print(f"\n>> Se modifico el producto '{producto['nombre']}' con exito.")
     elif opcion == 3:
         diferencia = nuevo_valor - producto["cantidad"]
         detalle = f"Cantidad: {producto['cantidad']} -> {nuevo_valor}"
-        producto["cantidad"] = nuevo_valor
-        registrar_movimiento(historial, clave, producto, "MODIF", diferencia, detalle)
-    print(f"\n>> Se modifico el producto '{producto['nombre']}' con exito.")
+        if reescribir_inventario(clave[0],clave[1], "cantidad", nuevo_valor):
+            registrar_movimiento( producto, "MODIF", diferencia, detalle)
+            print(f"\n>> Se modifico el producto '{producto['nombre']}' con exito.")
 
 def buscar_producto(termino):
     """Busca lotes por codigo, nombre, categoria o vencimiento (coincidencia parcial)"""
