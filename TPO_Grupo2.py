@@ -409,7 +409,7 @@ def dar_de_baja(clave, cantidad_baja):
             registrar_movimiento(producto, "BAJA", -cantidad_baja)
             print(f"\n>> Se dieron de baja {cantidad_baja} unidad(es) de '{producto['nombre']}'. Quedan {quedan}.")
 
-def modificar_producto(inventario, historial, clave, opcion, nuevo_valor):
+def modificar_producto(clave, opcion, nuevo_valor):
     """Modifica la categoria (1), el costo (2) o la cantidad (3) y registra la modificacion en el historial.
     El nuevo valor llega ya validado. La categoria se cambia en todos los lotes del mismo codigo."""
     producto = buscar_lote(clave[0], clave[1])
@@ -616,7 +616,7 @@ while opcion != 11:
             print("\nCategorias disponibles:")
             categoria = elegir_categoria()
             nombre = validar_nombre(input("Ingrese el nombre del producto: "))
-            vence = validar_fecha_actual(input("Ingrese la fecha de vencimiento del producto (AAAA/MM/DD): "))
+        vence = validar_fecha_actual(input("Ingrese la fecha de vencimiento del producto (AAAA/MM/DD): "))
         if (codigo, vence) in lotes:
             print("\n>> Ya existe un lote con ese vencimiento. Se sumaran unidades a su stock.")
             cantidad = validar_numero(input("Ingrese la cantidad de unidades que ingresan: "))
@@ -643,10 +643,10 @@ while opcion != 11:
                 opcion_mod = validar_numero(input("Opción inválida. Ingrese una opción válida: "))
             if opcion_mod == 1:
                 nuevo_valor = elegir_categoria()
-                modificar_producto(inventario, historial, clave, opcion_mod, nuevo_valor)
+                modificar_producto(clave, opcion_mod, nuevo_valor)
             elif opcion_mod != 4:
                 nuevo_valor = validar_numero(input("Ingrese el nuevo valor: "))
-                modificar_producto(inventario, historial, clave, opcion_mod, nuevo_valor)
+                modificar_producto(clave, opcion_mod, nuevo_valor)
 
     elif opcion == 5:
         termino = validar_no_es_vacio(input("Ingrese el codigo, nombre, categoria o vencimiento a buscar: "))
