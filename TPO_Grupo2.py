@@ -368,6 +368,8 @@ def imprimir_inventario():
                 linea = arch.readline()
         finally:
             arch.close()
+    except FileNotFoundError:
+        print("No hay productos registrados en el inventario.")
     except OSError as mensaje:
         print("Error al leer el inventario:", mensaje)
 
@@ -433,7 +435,7 @@ def modificar_producto(clave, opcion, nuevo_valor):
             print(f"\n>> Se modifico el producto '{producto['nombre']}' con exito.")
 
 def buscar_producto(termino):
-    """Busca lotes por codigo, nombre, categoria o vencimiento (coincidencia parcial)"""
+    """Busca lotes por codigo, nombre, categoria o vencimiento (coincidencia parcial, sin importar mayusculas)"""
     termino = termino.strip().lower()
     encontrados = 0
     try:
@@ -442,7 +444,7 @@ def buscar_producto(termino):
             linea = arch.readline()
             while linea != "":
                 producto = json.loads(linea)
-                if termino in linea:
+                if termino in linea.lower():
                     print(
                         producto["codigo"],
                         producto["categoria"],
@@ -453,12 +455,14 @@ def buscar_producto(termino):
                     )
                     encontrados += 1
                 linea = arch.readline()
-                if encontrados == 0:
-                    print("No se encontraron productos con ese criterio.")
         finally:
             arch.close()
+    except FileNotFoundError:
+        pass
     except OSError as mensaje:
-            print("Error al guardar el movimiento:", mensaje)
+        print("Error al leer el inventario:", mensaje)
+    if encontrados == 0:
+        print("No se encontraron productos con ese criterio.")
 
 def productos_proximos_a_vencer( dias):
     """Imprime los lotes ya vencidos y los que vencen dentro de los proximos 'dias' dias"""
@@ -480,6 +484,9 @@ def productos_proximos_a_vencer( dias):
             elif vence <= limite:
                 proximos[clave] = datos
             linea = arch.readline()
+    except FileNotFoundError:
+        print("No hay productos registrados en el inventario.")
+        return
     except OSError as mensaje:
         print("Error al leer el inventario:", mensaje)
         return
@@ -501,7 +508,8 @@ def productos_proximos_a_vencer( dias):
         imprimir_productos(proximos)
 
 def imprimir_por_categoria(categoria):
-    """Imprime los lotes de una categoria y el total de unidades disponibles"""
+    """Imprime los lotes de una categoria"""
+    encontrados = 0
     try:
         arch = open("inventario.jsonl", "r", encoding="utf-8")
         try:
@@ -517,11 +525,16 @@ def imprimir_por_categoria(categoria):
                         producto["costo"],
                         producto["cantidad"]
                     )
+                    encontrados += 1
                 linea = arch.readline()
         finally:
             arch.close()
+    except FileNotFoundError:
+        pass
     except OSError as mensaje:
-        print("Error al guardar el movimiento:", mensaje)
+        print("Error al leer el inventario:", mensaje)
+    if encontrados == 0:
+        print("No hay productos en esa categoria.")
 
 def imprimir_historial(categoria="", fecha=""):
     encontrados = 0
@@ -550,12 +563,15 @@ def imprimir_historial(categoria="", fecha=""):
 
         finally:
             arch.close()
+    except FileNotFoundError:
+        print("Todavia no hay movimientos registrados.")
+        return
     except OSError as mensaje:
         print("Error al leer el historial:", mensaje)
         return
-    if encontrados == 0:
-        print("No hay movimientos con esos criterios.")
-    print("Total de movimientos encontrados:", encontrados)
+        if encontrados == 0:
+            print("No hay movimientos con esos criterios.")
+        print("Total de movimientos encontrados:", encontrados)
 
 def valorizar_inventario():
     """Calcula el valor total del inventario (costo por cantidad de cada lote) leyendo linea por linea"""
