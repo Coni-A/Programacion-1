@@ -569,9 +569,9 @@ def imprimir_historial(categoria="", fecha=""):
     except OSError as mensaje:
         print("Error al leer el historial:", mensaje)
         return
-        if encontrados == 0:
-            print("No hay movimientos con esos criterios.")
-        print("Total de movimientos encontrados:", encontrados)
+    if encontrados == 0:
+        print("No hay movimientos con esos criterios.")
+    print("Total de movimientos encontrados:", encontrados)
 
 def valorizar_inventario():
     """Calcula el valor total del inventario (costo por cantidad de cada lote) leyendo linea por linea"""
