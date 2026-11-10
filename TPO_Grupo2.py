@@ -589,26 +589,50 @@ def valorizar_inventario():
     print("Unidades en total:".ljust(30) + str(unidades).rjust(15))
     print("Valor total del inventario:".ljust(30) + f"${total}".rjust(15))
 
-def estadisticas_productos_disponibles(inventario):
+def acumular_totales(arch, totales):
+    linea = arch.readline()
+
+    if linea != "":
+        producto = json.loads(linea)
+        categoria = producto["categoria"]
+        totales[categoria] = totales.get(categoria, 0) + producto["cantidad"]
+
+        acumular_totales(arch, totales)
+
+def estadisticas_productos_disponibles():
     """Muestra las categorias ordenadas de mayor a menor cantidad de unidades, con un grafico de barras"""
+
     imprimir_titulo("Categorias con mayor cantidad de productos")
-    if inventario == {}:
-        print("No hay productos registrados en el inventario.")
-        return
 
     totales = {}
-    for datos in inventario.values():
-        categoria = datos["categoria"]
-        totales[categoria] = totales.get(categoria, 0) + datos["cantidad"]
+
+    try:
+        arch = open("inventario.jsonl", "rt", encoding="utf-8")
+        try:
+            acumular_totales(arch, totales)
+        finally:
+            arch.close()
+
+    except FileNotFoundError:
+        pass
+    except OSError as mensaje:
+        print("Error al leer el inventario:", mensaje)
+        return
+
+    if totales == {}:
+        print("No hay productos registrados en el inventario.")
+        return
 
     ordenadas = sorted(totales.items(), key=lambda item: item[1], reverse=True)
     maximo = ordenadas[0][1]
 
     print("#".ljust(4) + "CATEGORIA".ljust(14) + "UNIDADES".rjust(9) + "  GRAFICO")
     print(linea("-"))
+
     for i, (categoria, unidades) in enumerate(ordenadas):
         barra = "#" * (unidades * 40 // maximo)
         print(str(i + 1).ljust(4) + categoria.capitalize().ljust(14) + str(unidades).rjust(9) + "  " + barra)
+
     print(linea("-"))
 
 # ----------------------------------------------------------------------
@@ -707,7 +731,7 @@ while opcion != 11:
         valorizar_inventario()
 
     elif opcion == 10:
-        estadisticas_productos_disponibles(inventario)
+        estadisticas_productos_disponibles()
 
     else:
         print("Opción inválida. Intente nuevamente.")
