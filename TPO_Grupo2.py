@@ -13,14 +13,6 @@ from datetime import datetime
 #   - TUPLAS: las claves del inventario, las fechas (anio, mes, dia), que se
 #     comparan directamente, las categorias definidas y las opciones del menu.
 #   - CONJUNTO: las categorias con productos y los codigos distintos.
-
-
-# Funciones a modificar:
-#- reponer_stock
-#- dar_de_baja
-#- modificar_producto
-#- productos_proximos_a_vencer
-#- valorizar_inventario
 # ======================================================================
 
 CATEGORIAS = ("lacteos", "limpieza", "conservas", "almacen", "bebidas", "higiene")

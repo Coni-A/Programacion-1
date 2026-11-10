@@ -1,0 +1,16 @@
+{"codigo": "300000002", "categoria": "conservas", "nombre": "Arvejas en lata 300g", "vence": "2026/11/01", "costo": 700, "cantidad": 6}
+{"codigo": "100000001", "categoria": "lacteos", "nombre": "Leche entera 1L", "vence": "2026/11/18", "costo": 1200, "cantidad": 24}
+{"codigo": "100000002", "categoria": "lacteos", "nombre": "Yogur frutilla 190g", "vence": "2026/11/14", "costo": 650, "cantidad": 15}
+{"codigo": "200000001", "categoria": "limpieza", "nombre": "Lavandina 1L", "vence": "2028/03/01", "costo": 900, "cantidad": 20}
+{"codigo": "400000001", "categoria": "almacen", "nombre": "Arroz largo fino 1kg", "vence": "2027/09/30", "costo": 1600, "cantidad": 25}
+{"codigo": "100000003", "categoria": "lacteos", "nombre": "Queso cremoso 500g", "vence": "2027/01/20", "costo": 4800, "cantidad": 8}
+{"codigo": "300000001", "categoria": "conservas", "nombre": "Atun en lata 170g", "vence": "2029/02/10", "costo": 2100, "cantidad": 18}
+{"codigo": "500000001", "categoria": "bebidas", "nombre": "Agua mineral 2L", "vence": "2027/08/01", "costo": 800, "cantidad": 36}
+{"codigo": "200000002", "categoria": "limpieza", "nombre": "Detergente 750ml", "vence": "2028/06/15", "costo": 1500, "cantidad": 12}
+{"codigo": "400000002", "categoria": "almacen", "nombre": "Fideos tirabuzon 500g", "vence": "2027/05/12", "costo": 950, "cantidad": 40}
+{"codigo": "600000001", "categoria": "higiene", "nombre": "Jabon de tocador", "vence": "2029/01/01", "costo": 600, "cantidad": 30}
+{"codigo": "100000001", "categoria": "lacteos", "nombre": "Leche entera 1L", "vence": "2026/12/05", "costo": 1200, "cantidad": 30}
+{"codigo": "500000002", "categoria": "bebidas", "nombre": "Gaseosa cola 1.5L", "vence": "2026/12/20", "costo": 2200, "cantidad": 20}
+{"codigo": "400000003", "categoria": "almacen", "nombre": "Yerba mate 1kg", "vence": "2027/12/01", "costo": 3900, "cantidad": 10}
+{"codigo": "600000002", "categoria": "higiene", "nombre": "Shampoo 400ml", "vence": "2028/10/10", "costo": 3200, "cantidad": 9}
+{"codigo": "123456789", "categoria": "conservas", "nombre": "Arbejas marolio", "vence": "2027/07/08", "costo": 1000, "cantidad": 56}

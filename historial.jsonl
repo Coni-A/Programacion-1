@@ -1,0 +1,16 @@
+{"codigo": "300000002", "categoria": "conservas", "nombre": "Arvejas en lata 300g", "fecha": "2026/10/20", "tipo": "ALTA", "cantidad": 6, "costo": 700, "total": 4200, "detalle": ""}
+{"codigo": "100000001", "categoria": "lacteos", "nombre": "Leche entera 1L", "fecha": "2026/11/02", "tipo": "ALTA", "cantidad": 24, "costo": 1200, "total": 28800, "detalle": ""}
+{"codigo": "100000002", "categoria": "lacteos", "nombre": "Yogur frutilla 190g", "fecha": "2026/11/02", "tipo": "ALTA", "cantidad": 15, "costo": 650, "total": 9750, "detalle": ""}
+{"codigo": "200000001", "categoria": "limpieza", "nombre": "Lavandina 1L", "fecha": "2026/11/02", "tipo": "ALTA", "cantidad": 20, "costo": 900, "total": 18000, "detalle": ""}
+{"codigo": "400000001", "categoria": "almacen", "nombre": "Arroz largo fino 1kg", "fecha": "2026/11/02", "tipo": "ALTA", "cantidad": 25, "costo": 1600, "total": 40000, "detalle": ""}
+{"codigo": "100000003", "categoria": "lacteos", "nombre": "Queso cremoso 500g", "fecha": "2026/11/03", "tipo": "ALTA", "cantidad": 8, "costo": 4800, "total": 38400, "detalle": ""}
+{"codigo": "300000001", "categoria": "conservas", "nombre": "Atun en lata 170g", "fecha": "2026/11/03", "tipo": "ALTA", "cantidad": 18, "costo": 2100, "total": 37800, "detalle": ""}
+{"codigo": "500000001", "categoria": "bebidas", "nombre": "Agua mineral 2L", "fecha": "2026/11/03", "tipo": "ALTA", "cantidad": 36, "costo": 800, "total": 28800, "detalle": ""}
+{"codigo": "200000002", "categoria": "limpieza", "nombre": "Detergente 750ml", "fecha": "2026/11/04", "tipo": "ALTA", "cantidad": 12, "costo": 1500, "total": 18000, "detalle": ""}
+{"codigo": "400000002", "categoria": "almacen", "nombre": "Fideos tirabuzon 500g", "fecha": "2026/11/04", "tipo": "ALTA", "cantidad": 40, "costo": 950, "total": 38000, "detalle": ""}
+{"codigo": "600000001", "categoria": "higiene", "nombre": "Jabon de tocador", "fecha": "2026/11/04", "tipo": "ALTA", "cantidad": 30, "costo": 600, "total": 18000, "detalle": ""}
+{"codigo": "100000001", "categoria": "lacteos", "nombre": "Leche entera 1L", "fecha": "2026/11/05", "tipo": "ALTA", "cantidad": 30, "costo": 1200, "total": 36000, "detalle": ""}
+{"codigo": "500000002", "categoria": "bebidas", "nombre": "Gaseosa cola 1.5L", "fecha": "2026/11/05", "tipo": "ALTA", "cantidad": 20, "costo": 2200, "total": 44000, "detalle": ""}
+{"codigo": "400000003", "categoria": "almacen", "nombre": "Yerba mate 1kg", "fecha": "2026/11/06", "tipo": "ALTA", "cantidad": 10, "costo": 3900, "total": 39000, "detalle": ""}
+{"codigo": "600000002", "categoria": "higiene", "nombre": "Shampoo 400ml", "fecha": "2026/11/06", "tipo": "ALTA", "cantidad": 9, "costo": 3200, "total": 28800, "detalle": ""}
+{"codigo": "123456789", "categoria": "conservas", "nombre": "Arbejas marolio", "fecha": "2026/11/10", "tipo": "ALTA", "cantidad": 56, "costo": 1000, "total": 56000, "detalle": ""}
